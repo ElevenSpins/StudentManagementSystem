@@ -41,24 +41,23 @@ void init(student **start, student **end) { // ** sind Pointer auf einen Pointer
    *end = NULL;
 }
 //Überprüft ob ein eingegebenes Datum ein echtes Datum ist.
-unsigned char check_date(char *date){
+unsigned char check_date(char *date, unsigned int *day, unsigned int *month, unsigned int *year){
     unsigned char err=TRUE;
     unsigned char leap=FALSE;
-    unsigned int d,m,y;
     //Erster Check ob das eigegebene Datum nur aus Zahlen besteht
     if(strlen(date)==10){
         if(date[2]=='.' && date[5]=='.'){
             int ic=0;
             for(int i=0;i<10;i++) if(i!=2 && i!=5 && 47<(int)date[i] && (int)date[i]<58) ic++;
             if(ic==8){
-                d=(date[0]-'0')*10;
-                d+=(date[1]-'0');
-                m=(date[3]-'0')*10;
-                m+=(date[4]-'0');
-                y=(date[6]-'0')*1000;
-                y+=(date[7]-'0')*100;
-                y+=(date[8]-'0')*10;
-                y+=(date[9]-'0');
+                *day=(date[0]-'0')*10;
+                *day+=(date[1]-'0');
+                *month=(date[3]-'0')*10;
+                *month+=(date[4]-'0');
+                *year=(date[6]-'0')*1000;
+                *year+=(date[7]-'0')*100;
+                *year+=(date[8]-'0')*10;
+                *year+=(date[9]-'0');
                 err=FALSE;
             }
             else printf(ERROR "Min. eins der Eingegebenen Zeichen ist keine Zahl!\n" RESET); 
@@ -72,38 +71,38 @@ unsigned char check_date(char *date){
     //Zweiter Check ob das Datum überhaupt Sinn macht
     if(!err){
         //Checken ob das Jahr ein Schaltjahr ist
-        if(y % 4 == 0){
-            if(y % 100 == 0) leap=(y%400==0)?TRUE:FALSE;
+        if(*year % 4 == 0){
+            if(*year % 100 == 0) leap=(*year%400==0)?TRUE:FALSE;
             else leap=TRUE;
         }else leap=FALSE;
 
         //Die Monate bis Juli, weil ab August die graden Monate die längeren Tage haben
-        if(m<=7){
-            if(m%2==0){
-                if(m!=2 && d<31){
+        if(*month<=7){
+            if(*month%2==0){
+                if(*month!=2 && *day<31){
                     err=TRUE; //Haben max 30 Tage
                     printf(ERROR "Dieser Monat hat nicht so viele Tage!\n" RESET);
                 }
-                if(m==2 && leap==TRUE && d>29){
+                if(*month==2 && leap==TRUE && *day>29){
                     err=TRUE; //Hat max 29 Tage
                     printf(ERROR "Der Monat Februar hat dieses Jahr max. 29 Tage!\n" RESET);
                 }
-                else if(m==2 && leap==FALSE && d>28){
+                else if(*month==2 && leap==FALSE && *day>28){
                     err=TRUE; //Hat max 28 Tage
                     printf(ERROR "Der Monat Februar hat dieses Jahr max. 28 Tage!\n" RESET);
                 }
             }
         }
         //Die Monate ab August (mit August)
-        else if(m>7 && m<13){
-            if(m%2==0){ //August, Oktober, Dezember
-                if(d>31){
+        else if(*month>7 && *month<13){
+            if(*month%2==0){ //August, Oktober, Dezember
+                if(*day>31){
                     err=TRUE; //Haben max 31 Tage
                     printf(ERROR "Dieser Monat hat nicht so viele Tage!\n" RESET);
                 }
             }
             else{ //September, November
-                if(d>30){
+                if(*day>30){
                     err=TRUE; //Haben max 30 Tage
                     printf(ERROR "Dieser Monat hat nicht so viele Tage!\n" RESET);
                 }
@@ -120,7 +119,7 @@ unsigned char check_date(char *date){
     return err;
 }
 
-
+//Fügt den input in die Liste ein
 void addstudent(student *start, student *end){
 
 }
@@ -129,11 +128,14 @@ void inputStudent(void){
     char in_surname[100];
     int in_matrikelnummer; //Darf nur 6 oder 7 Zeichen lang sein
     char in_startdate[10]; //10 wegen DD.MM.YYYY
-    unsigned int d, m ,y;
     char in_exitdate[10];
     char in_birthdate[10];
 
-    unsigned char err=FALSE;
+    unsigned int    startday, startmonth, startyear,
+                    exitday, exitmonth, exityear,
+                    birthday, birhtmonth, birhtyear;
+
+    unsigned char err=TRUE;
 
     printf("Nachname: ");
     scanf ("%[^\n]%*c", in_surname); //Dadruch kann man auch Leerzeichen mit in den String einlesen, es wird im auf \n im buffer gewartet, und mit %*c wird das \n aus dem String und dem buffer geworfen
@@ -151,20 +153,39 @@ void inputStudent(void){
         }
     }while(err);
 
-    printf("Startdatum (DD.MM.YYYY): ");
+    //Geburtdatum<Startdatum<Austrittsdatum
     do{
-        scanf("%s", in_startdate);
-    }while(check_date(in_startdate));
+        err=TRUE;
+        printf("Startdatum (DD.MM.YYYY): ");
+        do{
+            scanf("%s", in_startdate);
+        }while(check_date(in_startdate, &startday, &startmonth, &startyear));
     
-    printf("Austrittsdatum (DD.MM.YYYY): ");
-    do{
-        scanf("%s", in_exitdate);
-    }while(check_date(in_exitdate));
+        printf("Austrittsdatum (DD.MM.YYYY): ");
+        do{
+            scanf("%s", in_exitdate);
+        }while(check_date(in_exitdate, &exitday, &exitmonth, &exityear));
 
-    printf("Geburtstag (DD.MM.YYYY): ");
-    do{
-        scanf("%s", in_birthdate);
-    }while(check_date(in_birthdate));
+        printf("Geburtstag (DD.MM.YYYY): ");
+        do{
+            scanf("%s", in_birthdate);
+        }while(check_date(in_birthdate, &birthday, &birhtmonth, &birhtyear));
+        if(birhtyear<startyear){
+            if(startyear<exityear){
+                err=FALSE;
+            }
+            else if(startyear==exityear && startmonth<exitmonth){
+                err=FALSE;
+            }
+            else if(startyear==exityear && startmonth==exitmonth && startday<=exitday){
+                err=FALSE;
+            }
+        }
+        if(err){
+            printf(ERROR "Die Daten sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, ue);
+        }
+    }while(err);
+    
 
     /*
     ...Übergabe an addStudent();
