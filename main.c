@@ -3,7 +3,7 @@
 #include <string.h> //Damit strcpy() finktioniert
 #include <math.h> //Damit log() funktioniert
 #include <conio.h> //Damit getch() funktioniert
-//#include <windows.h>
+#include <windows.h>
 
 //Umlaute, um diese in der Konsole ausgeben zu können
 #define sss 0xe1 // ß
@@ -25,9 +25,9 @@
 #define RESET "\033[0m"
 
 //Farbzuweisung
-#define ERROR RED //Funktioniert in der .exe nur mit <windows.h> und wenn man system(color...) benutzt hat.
+#define ERR RED //Funktioniert in der .exe nur mit <windows.h> und wenn man system(color...) benutzt hat.
 #define COLORARROW GREEN
-#define IMPORTANTTEXT RED
+#define IMPORTANTTEXT CYAN
 
 #define TRUE 1
 #define FALSE 0
@@ -67,10 +67,17 @@ struct student{
     struct student *next;
 }*start, *end;
 
-// Initalisiert start und end mit NULL
+//Initalisiert start und end mit NULL
 void init(void){ // ** sind Pointer auf einen Pointer
    start = NULL;
    end = NULL;
+}
+
+//Warten auf eine Nutzereingabe
+void wait(void){
+    printf("\t\t  Dr%ccken Sie eine Taste um fortzufahren...", ue);
+    getch();
+    printf("\n");
 }
 
 //Gibt den die Länge eines int wieder (z.B. 10 = 2, 100=3) Überprüft auch ob nummer=0 ist, da sonst Fehler entstehen
@@ -80,7 +87,7 @@ int getLength(int nummer){
 }
 
 //Überprüft ob ein eingegebenes Datum ein echtes Datum ist.
-unsigned char check_date(char *date, unsigned int *day, unsigned int *month, unsigned int *year){
+unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsigned int *year){
     unsigned char err=TRUE;
     unsigned char leap=FALSE;
     //Erster Check ob das eigegebene Datum nur aus Zahlen besteht
@@ -99,13 +106,13 @@ unsigned char check_date(char *date, unsigned int *day, unsigned int *month, uns
                 *year+=(date[9]-'0');
                 err=FALSE;
             }
-            else printf(ERROR "Min. eins der Eingegebenen Zeichen ist keine Zahl!\n" RESET); 
+            else printf(ERR "Min. eins der Eingegebenen Zeichen ist keine Zahl!\n" RESET); 
         }
-        else printf(ERROR "Sie haben die Punkte falsch gesetzt!\n" RESET);
+        else printf(ERR "Sie haben die Punkte falsch gesetzt!\n" RESET);
     }
     else{
         err=TRUE;
-        printf(ERROR "Das Datum ist zu lang oder zu kurz!\n" RESET);
+        printf(ERR "Das Datum ist zu lang oder zu kurz!\n" RESET);
     }
     //Zweiter Check ob das Datum überhaupt Sinn macht
     if(!err){
@@ -120,15 +127,15 @@ unsigned char check_date(char *date, unsigned int *day, unsigned int *month, uns
             if(*month%2==0){
                 if(*month!=2 && *day<31){
                     err=TRUE; //Haben max 30 Tage
-                    printf(ERROR "Dieser Monat hat nicht so viele Tage!\n" RESET);
+                    printf(ERR "Dieser Monat hat nicht so viele Tage!\n" RESET);
                 }
                 if(*month==2 && leap==TRUE && *day>29){
                     err=TRUE; //Hat max 29 Tage
-                    printf(ERROR "Der Monat Februar hat dieses Jahr max. 29 Tage!\n" RESET);
+                    printf(ERR "Der Monat Februar hat dieses Jahr max. 29 Tage!\n" RESET);
                 }
                 else if(*month==2 && leap==FALSE && *day>28){
                     err=TRUE; //Hat max 28 Tage
-                    printf(ERROR "Der Monat Februar hat dieses Jahr max. 28 Tage!\n" RESET);
+                    printf(ERR "Der Monat Februar hat dieses Jahr max. 28 Tage!\n" RESET);
                 }
             }
         }
@@ -137,19 +144,19 @@ unsigned char check_date(char *date, unsigned int *day, unsigned int *month, uns
             if(*month%2==0){ //August, Oktober, Dezember
                 if(*day>31){
                     err=TRUE; //Haben max 31 Tage
-                    printf(ERROR "Dieser Monat hat nicht so viele Tage!\n" RESET);
+                    printf(ERR "Dieser Monat hat nicht so viele Tage!\n" RESET);
                 }
             }
             else{ //September, November
                 if(*day>30){
                     err=TRUE; //Haben max 30 Tage
-                    printf(ERROR "Dieser Monat hat nicht so viele Tage!\n" RESET);
+                    printf(ERR "Dieser Monat hat nicht so viele Tage!\n" RESET);
                 }
             }
         }
         else{
             err=TRUE;
-            printf(ERROR "Ein Jahr kann nicht mehr als 12 Monate haben!\n" RESET);
+            printf(ERR "Ein Jahr kann nicht mehr als 12 Monate haben!\n" RESET);
         }
     }
     if(err){
@@ -158,24 +165,44 @@ unsigned char check_date(char *date, unsigned int *day, unsigned int *month, uns
     return err;
 }
 
+//Checkt ob die Matrikelnummer zwischen 6 und 7 Ziffern lang ist und speichert die Nummer dann in der Variable auf den der Pointer zeigt
+void setMatrikel(int *pMatrikelnummer){
+    unsigned char err=TRUE;
+    do{
+        scanf("%d", pMatrikelnummer);
+        fflush(stdin);
+        int matrikelLength=getLength(*pMatrikelnummer);
+        if(!(5<matrikelLength && matrikelLength<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
+            err=TRUE;
+            printf("\t\t%c ",VERTICALLINE);
+            printf(ERR "Die Matrikelnummer darf nur zwischen 6 und 7 Stellen lang sein!\n" RESET);
+            printf("\t\t%c ",VERTICALLINE);
+            printf("Bitte geben Sie die Nummer erneut ein: ");
+        }
+        else{
+            err=FALSE;
+        }
+    }while(err);
+}
+
 //Fügt den input in die Liste ein (Bekommt nur pointer übergeben)
 void addStudent(char *in_surname, int *in_matrikelnummer,
-                int *pstartday, int *pstartmonth, int *pstartyear,
-                int *pexitday, int *pexitmonth, int *pexityear,
-                int *pbirthday, int *pbirthmonth, int *pbirthyear){
+                unsigned int *pstartday, unsigned int *pstartmonth, unsigned int *pstartyear,
+                unsigned int *pexitday, unsigned int *pexitmonth, unsigned int *pexityear,
+                unsigned int *pbirthday, unsigned int *pbirthmonth, unsigned int *pbirthyear){
     int c_counter=0;
     struct student *now, *before; //now ist ein pointer auf den jetzigen Listeneintrag, before ist der Eintrag vor dem now Eintrag
     if(end==NULL){
         end=malloc(sizeof(struct student));
         if(!end){
-            printf(ERROR "F%cr den end pointer konnte kein Speicher reserviert werden!" RESET, ue);
+            printf(ERR "F%cr den end pointer konnte kein Speicher reserviert werden!" RESET, ue);
             return;
         }
     }
     if(start==NULL){
         start=malloc(sizeof(struct student));
         if(!start){
-            printf(ERROR "F%cr den ersten student konnte kein Speicher reserviert werden!" RESET, ue);
+            printf(ERR "F%cr den ersten student konnte kein Speicher reserviert werden!" RESET, ue);
             return;
         }
         while(in_surname[c_counter]!='\0'){
@@ -183,7 +210,7 @@ void addStudent(char *in_surname, int *in_matrikelnummer,
         }
         start->surname=malloc(sizeof(char)*c_counter);
         if(!start->surname){
-            printf(ERROR "F%cr den Nachnamen konnte kein SPeicher reserviert werden!" RESET, ue);
+            printf(ERR "F%cr den Nachnamen konnte kein SPeicher reserviert werden!" RESET, ue);
             return;
         }
         c_counter=0;
@@ -210,7 +237,7 @@ void addStudent(char *in_surname, int *in_matrikelnummer,
         }
         now->next=malloc(sizeof(struct student));
         if(!now->next){
-            printf(ERROR "F%cr student konnte kein Speicher reserviert werden!" RESET, ue);
+            printf(ERR "F%cr student konnte kein Speicher reserviert werden!" RESET, ue);
             return;
         }
         before=now;
@@ -220,7 +247,7 @@ void addStudent(char *in_surname, int *in_matrikelnummer,
         }
         now->surname=malloc(sizeof(char)*c_counter);
         if(!now->surname){
-            printf(ERROR "F%cr den Nachnamen konnte kein SPeicher reserviert werden!" RESET, ue);
+            printf(ERR "F%cr den Nachnamen konnte kein SPeicher reserviert werden!" RESET, ue);
             return;
         }
         c_counter=0;
@@ -242,54 +269,47 @@ void addStudent(char *in_surname, int *in_matrikelnummer,
         before->next=now;
     }
 }
+
 //Lässt den User einen Studenten eingeben
 void inputStudent(void){
-    char in_surname[100];
+    char in_surname[25]; //max 24 Zeichen
     int in_matrikelnummer; //Darf nur 6 oder 7 Zeichen lang sein
-    char in_startdate[10]; //10 wegen DD.MM.YYYY
-    char in_exitdate[10];
-    char in_birthdate[10];
+    char in_startdate[11]; //11 wegen DD.MM.YYYY + \0
+    char in_exitdate[11];
+    char in_birthdate[11];
 
     unsigned int    startday, startmonth, startyear,
                     exitday, exitmonth, exityear,
                     birthday, birhtmonth, birhtyear;
 
     unsigned char err=TRUE;
-
     printf("Nachname: ");
-    scanf ("%[^\n]%*c", in_surname); //Dadruch kann man auch Leerzeichen mit in den String einlesen, es wird im auf \n im buffer gewartet, und mit %*c wird das \n aus dem String und dem buffer geworfen
+    fgets(in_surname,25,stdin); //Setzt immer ein \0 ans Ende + man kann auch Leerzeichen einlesen, man muss auf überschuss Aufpassen bei zulangen eingaben, darum fflush() 
+    fflush(stdin);
 
     printf("Matrikelnummer: ");
-    do{
-        scanf("%d", &in_matrikelnummer);
-        int matrikelLength=getLength(in_matrikelnummer);
-        if(!(5<matrikelLength && matrikelLength<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
-            err=TRUE;
-            printf(ERROR "Die Matrikelnummer darf nur zwischen 6 und 7 Stellen lang sein!\n" RESET);
-            printf("Bitte geben Sie die Nummer erneut ein: ");
-        }
-        else{
-            err=FALSE;
-        }
-    }while(err);
-
-    //Geburtdatum<Startdatum<Austrittsdatum
+    setMatrikel(&in_matrikelnummer);
+    
+    //Geburtdatum<Eintrittsdatum<Austrittsdatum
     do{
         err=TRUE;
-        printf("Startdatum (DD.MM.YYYY): ");
+        printf("Eintrittsdatum (DD.MM.YYYY): ");
         do{
-            scanf("%s", in_startdate);
-        }while(check_date(in_startdate, &startday, &startmonth, &startyear));
+            scanf("%10s", in_startdate);
+            fflush(stdin);
+        }while(checkDate(in_startdate, &startday, &startmonth, &startyear));
     
         printf("Austrittsdatum (DD.MM.YYYY): ");
         do{
-            scanf("%s", in_exitdate);
-        }while(check_date(in_exitdate, &exitday, &exitmonth, &exityear));
+            scanf("%10s", in_exitdate);
+            fflush(stdin);
+        }while(checkDate(in_exitdate, &exitday, &exitmonth, &exityear));
 
         printf("Geburtstag (DD.MM.YYYY): ");
         do{
-            scanf("%s", in_birthdate);
-        }while(check_date(in_birthdate, &birthday, &birhtmonth, &birhtyear));
+            scanf("%10s", in_birthdate);
+            fflush(stdin);
+        }while(checkDate(in_birthdate, &birthday, &birhtmonth, &birhtyear));
         if(birhtyear<startyear){
             if(startyear<exityear){
                 err=FALSE;
@@ -302,11 +322,13 @@ void inputStudent(void){
             }
         }
         if(err){
-            printf(ERROR "Die Daten sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, ue);
+            printf(ERR "Die Daten sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, ue);
         }
     }while(err);
+    
     addStudent(in_surname, &in_matrikelnummer, &startday, &startmonth, &startyear, &exitday, &exitmonth, &exityear, &birthday, &birhtmonth, &birhtyear);
 }
+
 //Gibt die Anzahl der gespeicherten Studenten zurück
 int countStudent(void){
     int countStudent=0;
@@ -322,18 +344,45 @@ int countStudent(void){
     }
     return countStudent;
 }
-//Warten auf eine Nutzereingabe
-void wait(void){
-    printf("\t\t  Dr%ccken Sie eine Taste um fortzufahren...", ue);
-    getch();
-    printf("\n");
-}
 
+//Geht die Liste durch bis die matrikelnummer gefunden wird, oder das Ende der Liste erreich ist
+void printStudent(int sMatrikelnummer){
+    if(!start){
+        printf("\t\t%c ",VERTICALLINE);
+        printf(ERR "Es gibt noch keine Eintr%cge in der Datenbank!\n" RESET, ae);
+        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+        return;
+    }
+    //Es wird der letzte Eintrag überprüft, da die while Schleife alle Einträge, außer den letzten Überprüft (Der letzte Eintrag hat nähmlich now->next==NULL darum wird die while schleife abgebrochen)
+    if(end->matrikelnummer==sMatrikelnummer){
+            printf("\t\t%c",TCROSSRIGHT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", TCROSSLEFT); 
+            printf("\t\t%c Name                      %c Matrikelnummer %c Geburtstag %c Eintrittsdatum %c Austrittsdatum %c\n", VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE);
+            printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT); 
+            return;
+    }
+
+    struct student *now;
+    now=start;
+    while(now->next!=NULL){ //Der letzte Eintrag wird nicht getestet, da dort der Zeiger auf NULL zeigt!
+        if(now->matrikelnummer==sMatrikelnummer){
+            printf("\t\t%c",TCROSSRIGHT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", TCROSSLEFT); 
+            printf("\t\t%c Name                      %c Matrikelnummer %c Geburtstag %c Eintrittsdatum %c Austrittsdatum %c\n", VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE);
+            printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT); 
+            return;
+        }
+        now=now->next;
+    }
+    printf("\t\t%c ",VERTICALLINE);
+    printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, sMatrikelnummer);
+    printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+}
 //Menü
 int menu(void){
+    system("color");
     int pos=0;
     char input='o';
     do{
+        //system("cls");
         switch(input){
             case 'w':
                 pos==0?pos=5:pos--;
@@ -365,6 +414,7 @@ int menu(void){
     return pos;
 }
 
+//Main
 int main(void){
     init();
     //read();
@@ -377,19 +427,28 @@ int main(void){
             inputStudent();
         break;
         case 1:
-            //Schöne Aufgabe
+            //Schöne Ausgabe
             {
-            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
-            int len=3;
-            int count=countStudent();
-            len=4-getLength(count);
-            printf("\t\t%c Es befinden sich " IMPORTANTTEXT "%d" RESET, VERTICALLINE, count);  printf(" Eintr%cge in der Datenbank!     ", ae); for(int i=0;i<len;i++) printf(" "); printf("%c\n", VERTICALLINE);
-            printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+                system("cls");
+                printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+                int len=3;
+                int count=countStudent();
+                len=4-getLength(count);
+                printf("\t\t%c Es befinden sich " IMPORTANTTEXT "%d" RESET, VERTICALLINE, count);  printf(" Eintr%cge in der Datenbank!     ", ae); for(int i=0;i<len;i++) printf(" "); printf("%c\n", VERTICALLINE);
+                printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
             }
             //countStudent(); Ohne pointer, da in der Aufgabe steht, dass diese Funktion einen Wert zurück gibt
             wait();
         break;
         case 2:
+            {
+                int search;
+                printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+                printf("\t\t%c Zu suchende Matrikelnummer: ", VERTICALLINE);
+                setMatrikel(&search);
+                printStudent(search);
+            }
+            wait();
             //printStudent(Matrikelnummer)
         break;
         case 3:
@@ -404,10 +463,9 @@ int main(void){
         break;
         
         default:
-            printf(ERROR "!Fehler select hat den ung%cltigen Wert '%d'!\n" RESET, ue, select);
+            printf(ERR "!Fehler select hat den ung%cltigen Wert '%d'!\n" RESET, ue, select);
         break;
         }
-        printf("\n\n\n\n\n\n\n\n\n");
     }while(select!=5);
     //save();
     return 0;
