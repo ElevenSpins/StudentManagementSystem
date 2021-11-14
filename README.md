@@ -10,7 +10,7 @@
 
 ✓ Schreibe eine Funktion addStudent: bei der ein Student hinzugefügt wird.
 
-- Schreibe eine Funktion in der die Anzahl der gespeicherten Studenten zurueck gegeben werden soll.
+✓ Schreibe eine Funktion in der die Anzahl der gespeicherten Studenten zurueck gegeben werden soll.
 
 - Schreibe eine Funktion printStudent(Matrikelnummer), mit der ein Student auf dem Bildschirm ausgegeben werden soll
 

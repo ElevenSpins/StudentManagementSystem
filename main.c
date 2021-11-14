@@ -5,6 +5,7 @@
 #include <conio.h> //Damit getch() funktioniert
 //#include <windows.h>
 
+//Umlaute, um diese in der Konsole ausgeben zu können
 #define sss 0xe1 // ß
 #define oe 0x94 // ö
 #define ae 0x84 // ä
@@ -12,6 +13,7 @@
 
 #define UE 0x9a // Ü
 
+//Farben
 #define BLACK "\x1b[30m"
 #define RED "\033[0;31m"
 #define GREEN "\x1b[32m"
@@ -20,11 +22,12 @@
 #define MAGENTA "\x1b[35m"
 #define CYAN "\x1b[36m"
 #define WHITE "\x1b[37m"
-
 #define RESET "\033[0m"
 
+//Farbzuweisung
 #define ERROR RED //Funktioniert in der .exe nur mit <windows.h> und wenn man system(color...) benutzt hat.
 #define COLORARROW GREEN
+#define IMPORTANTTEXT RED
 
 #define TRUE 1
 #define FALSE 0
@@ -44,6 +47,8 @@
 #define TCROSSRIGHT 0xcc
 #define TCROSSLEFT 0xb9
 
+#define MENUMAX 54 //Wie größ das Menü sein soll (in der Breite)
+
 
 struct date{
         unsigned int day;
@@ -60,13 +65,20 @@ struct student{
     struct date birthdate;
     struct student *previous;
     struct student *next;
-};
+}*start, *end;
 
 // Initalisiert start und end mit NULL
-void init(struct student **start, struct student **end){ // ** sind Pointer auf einen Pointer
-   *start = NULL;
-   *end = NULL;
+void init(void){ // ** sind Pointer auf einen Pointer
+   start = NULL;
+   end = NULL;
 }
+
+//Gibt den die Länge eines int wieder (z.B. 10 = 2, 100=3) Überprüft auch ob nummer=0 ist, da sonst Fehler entstehen
+int getLength(int nummer){
+    if(nummer==0) return 1;
+    return (floor(log10(abs(nummer))) + 1);
+}
+
 //Überprüft ob ein eingegebenes Datum ein echtes Datum ist.
 unsigned char check_date(char *date, unsigned int *day, unsigned int *month, unsigned int *year){
     unsigned char err=TRUE;
@@ -147,7 +159,7 @@ unsigned char check_date(char *date, unsigned int *day, unsigned int *month, uns
 }
 
 //Fügt den input in die Liste ein (Bekommt nur pointer übergeben)
-void addStudent(struct student *start, struct student *end, char *in_surname, int *in_matrikelnummer,
+void addStudent(char *in_surname, int *in_matrikelnummer,
                 int *pstartday, int *pstartmonth, int *pstartyear,
                 int *pexitday, int *pexitmonth, int *pexityear,
                 int *pbirthday, int *pbirthmonth, int *pbirthyear){
@@ -231,7 +243,7 @@ void addStudent(struct student *start, struct student *end, char *in_surname, in
     }
 }
 //Lässt den User einen Studenten eingeben
-void inputStudent(struct student *start, struct student *end){
+void inputStudent(void){
     char in_surname[100];
     int in_matrikelnummer; //Darf nur 6 oder 7 Zeichen lang sein
     char in_startdate[10]; //10 wegen DD.MM.YYYY
@@ -250,7 +262,8 @@ void inputStudent(struct student *start, struct student *end){
     printf("Matrikelnummer: ");
     do{
         scanf("%d", &in_matrikelnummer);
-        if(!(5<(floor(log10(abs(in_matrikelnummer))) + 1) && (floor(log10(abs(in_matrikelnummer))) + 1)<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
+        int matrikelLength=getLength(in_matrikelnummer);
+        if(!(5<matrikelLength && matrikelLength<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
             err=TRUE;
             printf(ERROR "Die Matrikelnummer darf nur zwischen 6 und 7 Stellen lang sein!\n" RESET);
             printf("Bitte geben Sie die Nummer erneut ein: ");
@@ -292,13 +305,34 @@ void inputStudent(struct student *start, struct student *end){
             printf(ERROR "Die Daten sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, ue);
         }
     }while(err);
-    addStudent(start, end, in_surname, &in_matrikelnummer, &startday, &startmonth, &startyear, &exitday, &exitmonth, &exityear, &birthday, &birhtmonth, &birhtyear);
+    addStudent(in_surname, &in_matrikelnummer, &startday, &startmonth, &startyear, &exitday, &exitmonth, &exityear, &birthday, &birhtmonth, &birhtyear);
+}
+//Gibt die Anzahl der gespeicherten Studenten zurück
+int countStudent(void){
+    int countStudent=0;
+    if(!start){
+        return countStudent;
+    }
+    struct student *now;
+    countStudent++; //Da es einen Eintrag gibt (sonst wäre if(!start) ausgeführt worden)
+    now=start; //Wir zeigen auf das aller erste Element
+    while(now->next!=NULL){ //Wir gucken ob das erste Element auf ein weiteres Zeigt (Dafür muss es bereit 1. Element geben)
+        now=now->next;
+        countStudent++;
+    }
+    return countStudent;
+}
+//Warten auf eine Nutzereingabe
+void wait(void){
+    printf("\t\t  Dr%ccken Sie eine Taste um fortzufahren...", ue);
+    getch();
+    printf("\n");
 }
 
+//Menü
 int menu(void){
     int pos=0;
     char input='o';
-    int max=54;
     do{
         switch(input){
             case 'w':
@@ -308,11 +342,11 @@ int menu(void){
                 pos==5?pos=0:pos++;
             break;
         }
-        printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=max;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
-        printf("\t\t%c", VERTICALLINE); for(int i=1;i<=(max/2)-2;i++) printf("%c", SPACE); printf("MEN%c", UE); for(int i=1;i<=(max/2)-2;i++) printf("%c", SPACE); printf("%c\n", VERTICALLINE);
+        printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+        printf("\t\t%c", VERTICALLINE); for(int i=1;i<=(MENUMAX/2)-2;i++) printf("%c", SPACE); printf("MEN%c", UE); for(int i=1;i<=(MENUMAX/2)-2;i++) printf("%c", SPACE); printf("%c\n", VERTICALLINE);
         printf("\t\t%c Dr%ccken Sie x, wenn Sie eine Auswahl getroffen haben %c\n", VERTICALLINE, ue, VERTICALLINE);
         printf("\t\t%c         Dr%ccken Sie w oder s um zu navigieren        %c\n", VERTICALLINE, ue, VERTICALLINE);
-        printf("\t\t%c", TCROSSRIGHT); for(int i=1;i<=max;i++) printf("%c", HORIZONLINE); printf("%c\n", TCROSSLEFT);
+        printf("\t\t%c", TCROSSRIGHT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", TCROSSLEFT);
 
         printf("\t\t%c", VERTICALLINE); for(int i=1;i<=5;i++) printf("%c", SPACE); pos==0?printf("%c", MENU_ARROW):printf("%c", SPACE); for(int i=1;i<=5;i++) printf("%c", SPACE); printf("1. Eingabe eines neuen Studenten"); for(int i=1;i<=11;i++) printf("%c", SPACE); printf("%c\n", VERTICALLINE);
         printf("\t\t%c", VERTICALLINE); for(int i=1;i<=5;i++) printf("%c", SPACE); pos==1?printf("%c", MENU_ARROW):printf("%c", SPACE); for(int i=1;i<=5;i++) printf("%c", SPACE); printf("2. Gesamte Anzahl aller Studenten"); for(int i=1;i<=10;i++) printf("%c", SPACE); printf("%c\n", VERTICALLINE);
@@ -321,7 +355,7 @@ int menu(void){
         printf("\t\t%c", VERTICALLINE); for(int i=1;i<=5;i++) printf("%c", SPACE); pos==4?printf("%c", MENU_ARROW):printf("%c", SPACE); for(int i=1;i<=5;i++) printf("%c", SPACE); printf("5. Studenten l%cschen", oe); for(int i=1;i<=23;i++) printf("%c", SPACE); printf("%c\n", VERTICALLINE);
         printf("\t\t%c", VERTICALLINE); for(int i=1;i<=5;i++) printf("%c", SPACE); pos==5?printf("%c", MENU_ARROW):printf("%c", SPACE); for(int i=1;i<=5;i++) printf("%c", SPACE); printf("6. Beenden"); for(int i=1;i<=33;i++) printf("%c", SPACE); printf("%c\n", VERTICALLINE);
 
-        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=max;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
         printf("\t\t");
         fflush(stdin);
         input=getch();
@@ -332,9 +366,7 @@ int menu(void){
 }
 
 int main(void){
-    struct student *start; //Pointer der auf den ersten Eintrag zeigt
-    struct student *end; //Pointer der auf den letzten Eintrag zeigt
-    init(&start, &end);
+    init();
     //read();
     int select;
     do{
@@ -342,10 +374,20 @@ int main(void){
         switch (select)
         {
         case 0:
-            inputStudent(start, end);
+            inputStudent();
         break;
         case 1:
-            //Anzahl der gespeicherten Studenten zurueck gegeben werden soll
+            //Schöne Aufgabe
+            {
+            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+            int len=3;
+            int count=countStudent();
+            len=4-getLength(count);
+            printf("\t\t%c Es befinden sich " IMPORTANTTEXT "%d" RESET, VERTICALLINE, count);  printf(" Eintr%cge in der Datenbank!     ", ae); for(int i=0;i<len;i++) printf(" "); printf("%c\n", VERTICALLINE);
+            printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+            }
+            //countStudent(); Ohne pointer, da in der Aufgabe steht, dass diese Funktion einen Wert zurück gibt
+            wait();
         break;
         case 2:
             //printStudent(Matrikelnummer)
@@ -365,7 +407,10 @@ int main(void){
             printf(ERROR "!Fehler select hat den ung%cltigen Wert '%d'!\n" RESET, ue, select);
         break;
         }
+        printf("\n\n\n\n\n\n\n\n\n");
     }while(select!=5);
     //save();
     return 0;
 }
+
+//der start und end pointer sind jetzt global
