@@ -65,13 +65,7 @@ struct student{
     struct date birthdate;
     struct student *previous;
     struct student *next;
-}*start, *end;
-
-//Initalisiert start und end mit NULL
-void init(void){ // ** sind Pointer auf einen Pointer
-   start = NULL;
-   end = NULL;
-}
+}*start=NULL, *end=NULL;
 
 //Warten auf eine Nutzereingabe
 void wait(void){
@@ -305,7 +299,7 @@ void inputStudent(void){
                     birthday, birhtmonth, birhtyear;
 
     unsigned char err=TRUE;
-    printf("Nachname: ");
+    printf("\t\t%c Nachname: ", VERTICALLINE);
     fgets(in_surname,25,stdin); //Setzt immer ein \0 ans Ende + man kann auch Leerzeichen einlesen, man muss auf überschuss Aufpassen bei zulangen eingaben, darum fflush() 
     fflush(stdin);
     for(int i=0;i<25;i++){  //Da fgets auch das Enter in das Array packt und das später bei der Ausgabe Probleme macht entfernen wir das hier 
@@ -314,7 +308,7 @@ void inputStudent(void){
             break;
         }
     }
-    printf("Matrikelnummer: ");
+    printf("\t\t%c Matrikelnummer: ", VERTICALLINE);
     do{
         err=TRUE;
         setMatrikel(&in_matrikelnummer);
@@ -326,19 +320,19 @@ void inputStudent(void){
     //Geburtdatum<Eintrittsdatum<Austrittsdatum
     do{
         err=TRUE;
-        printf("Eintrittsdatum (DD.MM.YYYY): ");
+        printf("\t\t%c Eintrittsdatum (DD.MM.YYYY): ", VERTICALLINE);
         do{
             scanf("%10s", in_startdate);
             fflush(stdin);
         }while(checkDate(in_startdate, &startday, &startmonth, &startyear));
     
-        printf("Austrittsdatum (DD.MM.YYYY): ");
+        printf("\t\t%c Austrittsdatum (DD.MM.YYYY): ", VERTICALLINE);
         do{
             scanf("%10s", in_exitdate);
             fflush(stdin);
         }while(checkDate(in_exitdate, &exitday, &exitmonth, &exityear));
 
-        printf("Geburtstag (DD.MM.YYYY): ");
+        printf("\t\t%c Geburtstag (DD.MM.YYYY): ", VERTICALLINE);
         do{
             scanf("%10s", in_birthdate);
             fflush(stdin);
@@ -355,10 +349,9 @@ void inputStudent(void){
             }
         }
         if(err){
-            printf(ERR "Die Daten sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, ue);
+            printf("\t\t%c " ERR "Die Daten sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, VERTICALLINE, ue);
         }
     }while(err);
-    
     addStudent(in_surname, &in_matrikelnummer, &startday, &startmonth, &startyear, &exitday, &exitmonth, &exityear, &birthday, &birhtmonth, &birhtyear);
 }
 
@@ -379,13 +372,17 @@ int countStudent(void){
 }
 
 //Geht die Liste durch bis die matrikelnummer gefunden wird, oder das Ende der Liste erreich ist
-void printStudent(int sMatrikelnummer){
+void printStudent(){
+    int sMatrikelnummer;
+    printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
     if(!start){
         printf("\t\t%c ",VERTICALLINE);
         printf(ERR "Es gibt noch keine Eintr%cge in der Datenbank!\n" RESET, ae);
         printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
         return;
     }
+    printf("\t\t%c Zu suchende Matrikelnummer: ", VERTICALLINE);
+    setMatrikel(&sMatrikelnummer);
     struct student *now=search(sMatrikelnummer);
     if(!now){
         printf("\t\t%c ",VERTICALLINE);
@@ -401,7 +398,6 @@ void printStudent(int sMatrikelnummer){
 
 //Menü
 int menu(void){
-    system("color");
     int pos=0;
     char input='o';
     do{
@@ -439,15 +435,16 @@ int menu(void){
 
 //Main
 int main(void){
-    init();
     //read();
+    system("color");
     int select;
-    int search=0;
     do{
         select=menu();
         switch (select)
         {
         case 0:
+        system("cls");
+            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
             inputStudent();
         break;
         case 1:
@@ -467,11 +464,7 @@ int main(void){
         case 2:
             {
                 system("cls");
-                printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
-                printf("\t\t%c Zu suchende Matrikelnummer: ", VERTICALLINE);
-                setMatrikel(&search);
-                printStudent(search);
-                search=0;
+                printStudent();
             }
             wait();
             //printStudent(Matrikelnummer)
