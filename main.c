@@ -69,7 +69,7 @@ struct student{
 
 //Warten auf eine Nutzereingabe
 void wait(void){
-    printf("\t\t  Dr%ccken Sie eine Taste um fortzufahren...", ue);
+    printf("\n\t\t  Dr%ccken Sie eine Taste um fortzufahren...", ue);
     getch();
     printf("\n");
 }
@@ -100,13 +100,13 @@ unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsi
                 *year+=(date[9]-'0');
                 err=FALSE;
             }
-            else printf(ERR "Min. eins der Eingegebenen Zeichen ist keine Zahl!\n" RESET); 
+            else printf("\t\t%c " ERR "Min. eins der Eingegebenen Zeichen ist keine Zahl!\n" RESET, VERTICALLINE); 
         }
-        else printf(ERR "Sie haben die Punkte falsch gesetzt!\n" RESET);
+        else printf("\t\t%c " ERR "Sie haben die Punkte falsch gesetzt!\n" RESET, VERTICALLINE);
     }
     else{
         err=TRUE;
-        printf(ERR "Das Datum ist zu lang oder zu kurz!\n" RESET);
+        printf("\t\t%c " ERR "Das Datum ist zu lang oder zu kurz!\n" RESET, VERTICALLINE);
     }
     //Zweiter Check ob das Datum überhaupt Sinn macht
     if(!err){
@@ -121,15 +121,15 @@ unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsi
             if(*month%2==0){
                 if(*month!=2 && *day<31){
                     err=TRUE; //Haben max 30 Tage
-                    printf(ERR "Dieser Monat hat nicht so viele Tage!\n" RESET);
+                    printf("\t\t%c " ERR "Dieser Monat hat nicht so viele Tage!\n" RESET, VERTICALLINE);
                 }
                 if(*month==2 && leap==TRUE && *day>29){
                     err=TRUE; //Hat max 29 Tage
-                    printf(ERR "Der Monat Februar hat dieses Jahr max. 29 Tage!\n" RESET);
+                    printf("\t\t%c " ERR "Der Monat Februar hat dieses Jahr max. 29 Tage!\n" RESET, VERTICALLINE);
                 }
                 else if(*month==2 && leap==FALSE && *day>28){
                     err=TRUE; //Hat max 28 Tage
-                    printf(ERR "Der Monat Februar hat dieses Jahr max. 28 Tage!\n" RESET);
+                    printf("\t\t%c " ERR "Der Monat Februar hat dieses Jahr max. 28 Tage!\n" RESET, VERTICALLINE);
                 }
             }
         }
@@ -138,23 +138,23 @@ unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsi
             if(*month%2==0){ //August, Oktober, Dezember
                 if(*day>31){
                     err=TRUE; //Haben max 31 Tage
-                    printf(ERR "Dieser Monat hat nicht so viele Tage!\n" RESET);
+                    printf("\t\t%c " ERR "Dieser Monat hat nicht so viele Tage!\n" RESET, VERTICALLINE);
                 }
             }
             else{ //September, November
                 if(*day>30){
                     err=TRUE; //Haben max 30 Tage
-                    printf(ERR "Dieser Monat hat nicht so viele Tage!\n" RESET);
+                    printf("\t\t%c " ERR "Dieser Monat hat nicht so viele Tage!\n" RESET, VERTICALLINE);
                 }
             }
         }
         else{
             err=TRUE;
-            printf(ERR "Ein Jahr kann nicht mehr als 12 Monate haben!\n" RESET);
+            printf("\t\t%c " ERR "Ein Jahr kann nicht mehr als 12 Monate haben!\n" RESET, VERTICALLINE);
         }
     }
     if(err){
-        printf("Bitte geben Sie das Datum erneut ein (DD.MM.YYYY): ");
+        printf("\t\t%c Bitte geben Sie das Datum erneut ein (DD.MM.YYYY): ", VERTICALLINE);
     }
     return err;
 }
@@ -371,8 +371,8 @@ int countStudent(void){
     return countStudent;
 }
 
-//Geht die Liste durch bis die matrikelnummer gefunden wird, oder das Ende der Liste erreich ist
-void printStudent(){
+//Gibt den Studenten mit der gesuchten Matrikelnummer aus
+void printStudent(void){
     int sMatrikelnummer;
     printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
     if(!start){
@@ -394,6 +394,59 @@ void printStudent(){
     printf("\t\t%c Name                      %c Matrikelnummer %c Geburtstag %c Eintrittsdatum %c Austrittsdatum %c\n", VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE);
     printf("\t\t%c %s", VERTICALLINE, now->surname); for(int i=0;i<(25-strlen(now->surname));i++) printf(" "); printf(" %c %d", VERTICALLINE, now->matrikelnummer); if(getLength(now->matrikelnummer)==6) printf(" "); for(int i=0;i<7;i++) printf(" "); printf(" %c %02d.%02d.%04d", VERTICALLINE, now->birthdate.day, now->birthdate.month, now->birthdate.year); printf(" %c %02d.%02d.%04d    ", VERTICALLINE, now->startdate.day, now->startdate.month, now->startdate.year); printf(" %c %02d.%02d.%04d     %c\n", VERTICALLINE, now->exitdate.day, now->exitdate.month, now->exitdate.year, VERTICALLINE); 
     printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT); 
+}
+
+//Löscht den Studenten mit der gesuchten Matrikelnummer
+void deleteStudent(void){
+    int sMatrikelnummer;
+    printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+    if(!start){
+        printf("\t\t%c ",VERTICALLINE);
+        printf(ERR "Es gibt noch keine Eintr%cge in der Datenbank!\n" RESET, ae);
+        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+        return;
+    }
+    printf("\t\t%c Zu l%cschende Matrikelnummer: ", VERTICALLINE, oe);
+    setMatrikel(&sMatrikelnummer);
+    struct student *del=search(sMatrikelnummer);
+    struct student *delNext=NULL; //delNext wird als pointer auf das nächste Element nach del genutzt 
+    struct student *delPrev=NULL; //delPrev wird als pointer auf das Element vor dem zu löschenden genutzt
+    if(!del){
+        printf("\t\t%c ",VERTICALLINE);
+        printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, sMatrikelnummer);
+        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+        return;
+    }
+    /*LÖSCHEN*/
+    if(del==start){ //Soll das erste Element gelöscht werden 
+        delNext=start->next;
+        if(!delNext){ //Falls es nach dem ersten Element keine weiteren 
+            free(start);
+            start=NULL;
+            end=NULL;
+            printf("\t\t%c Der Student wurde gel%cscht!\n", VERTICALLINE, oe);
+            printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+            return;
+        }
+        delNext->previous=NULL;
+        free(start);
+        start=delNext;
+    }
+    else if(del==end){ //Soll das letzte Element gelöscht werden ?
+        delPrev=end->previous;
+        delPrev->next=NULL;
+        end=delPrev;
+        free(del);
+    }
+    else{ //Ein anderes Element in der Liste soll gelöscht werden
+        delPrev=del->previous;
+        delNext=del->next;
+        delPrev->next=delNext;
+        delNext->previous=delPrev;
+        free(del);
+    }
+    printf("\t\t%c Der Student wurde gel%cscht!\n", VERTICALLINE, oe);
+    printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
 }
 
 //Menü
@@ -473,7 +526,12 @@ int main(void){
             //printAllStudents()
         break;
         case 4:
-            //deleteStudent(matrikelnummer)
+            {
+                system("cls");
+                deleteStudent();
+            }
+            wait();
+            //deleteStudent(Matrikelnummer)
         break;
         
         case 5:
@@ -481,7 +539,7 @@ int main(void){
         break;
         
         default:
-            printf(ERR "!Fehler select hat den ung%cltigen Wert '%d'!\n" RESET, ue, select);
+            printf("\t\t%c " ERR "!Fehler select hat den ung%cltigen Wert '%d'!\n" RESET, VERTICALLINE, ue, select);
         break;
         }
     }while(select!=5);
