@@ -165,6 +165,22 @@ unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsi
     return err;
 }
 
+//Diese Funktion gibt den pointer auf den Studenten mit der Matrikelnummer zurück, wenn keiner gefunden wurde wird NULL returned! Diese Funktion testet nicht ob es bereits Einträge gibt 
+struct student *search(int sMatrikelnummer){
+    if(end->matrikelnummer==sMatrikelnummer){
+            return end;
+    }
+    struct student *now;
+    now=start;
+    while(now->next!=NULL){ //Der letzte Eintrag wird nicht getestet, da dort der Zeiger auf NULL zeigt!
+        if(now->matrikelnummer==sMatrikelnummer){
+            return now;
+        }
+        now=now->next;
+    }
+    return NULL;
+}
+
 //Checkt ob die Matrikelnummer zwischen 6 und 7 Ziffern lang ist und speichert die Nummer dann in der Variable auf den der Pointer zeigt
 void setMatrikel(int *pMatrikelnummer){
     unsigned char err=TRUE;
@@ -208,6 +224,9 @@ void addStudent(char *in_surname, int *in_matrikelnummer,
         while(in_surname[c_counter]!='\0'){
             c_counter++;
         }
+        //noch einmal +1, da das \0 auch übergeben werden muss, sonst weiß strcpy() nicht wann der String endet
+        c_counter++;
+        //----
         start->surname=malloc(sizeof(char)*c_counter);
         if(!start->surname){
             printf(ERR "F%cr den Nachnamen konnte kein SPeicher reserviert werden!" RESET, ue);
@@ -245,6 +264,9 @@ void addStudent(char *in_surname, int *in_matrikelnummer,
         while(in_surname[c_counter]!='\0'){
             c_counter++;
         }
+        //noch einmal +1, da das \0 auch übergeben werden muss, sonst weiß strcpy() nicht wann der String endet
+        c_counter++; 
+        //----
         now->surname=malloc(sizeof(char)*c_counter);
         if(!now->surname){
             printf(ERR "F%cr den Nachnamen konnte kein SPeicher reserviert werden!" RESET, ue);
@@ -286,9 +308,20 @@ void inputStudent(void){
     printf("Nachname: ");
     fgets(in_surname,25,stdin); //Setzt immer ein \0 ans Ende + man kann auch Leerzeichen einlesen, man muss auf überschuss Aufpassen bei zulangen eingaben, darum fflush() 
     fflush(stdin);
-
+    for(int i=0;i<25;i++){  //Da fgets auch das Enter in das Array packt und das später bei der Ausgabe Probleme macht entfernen wir das hier 
+        if(in_surname[i]=='\n'){
+            in_surname[i]='\0';
+            break;
+        }
+    }
     printf("Matrikelnummer: ");
-    setMatrikel(&in_matrikelnummer);
+    do{
+        err=TRUE;
+        setMatrikel(&in_matrikelnummer);
+        if(!start) err=FALSE; //Muss getestet werden, da search das nicht macht, ohne diesen Test würde search abstürzen (Absturz da end=NULL führt zu NULL->matrikelnummer)
+        else (!search(in_matrikelnummer))?err=FALSE:printf("\t\t%c " ERR "Es gibt bereits einen Studenten mit dieser Matrikelnummer!" RESET "\n\t\t%c Bitte geben Sie eine neue Nummer ein: ", VERTICALLINE, VERTICALLINE);
+    }while(err);
+    
     
     //Geburtdatum<Eintrittsdatum<Austrittsdatum
     do{
@@ -353,36 +386,26 @@ void printStudent(int sMatrikelnummer){
         printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
         return;
     }
-    //Es wird der letzte Eintrag überprüft, da die while Schleife alle Einträge, außer den letzten Überprüft (Der letzte Eintrag hat nähmlich now->next==NULL darum wird die while schleife abgebrochen)
-    if(end->matrikelnummer==sMatrikelnummer){
-            printf("\t\t%c",TCROSSRIGHT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", TCROSSLEFT); 
-            printf("\t\t%c Name                      %c Matrikelnummer %c Geburtstag %c Eintrittsdatum %c Austrittsdatum %c\n", VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE);
-            printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT); 
-            return;
+    struct student *now=search(sMatrikelnummer);
+    if(!now){
+        printf("\t\t%c ",VERTICALLINE);
+        printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, sMatrikelnummer);
+        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+        return;
     }
-
-    struct student *now;
-    now=start;
-    while(now->next!=NULL){ //Der letzte Eintrag wird nicht getestet, da dort der Zeiger auf NULL zeigt!
-        if(now->matrikelnummer==sMatrikelnummer){
-            printf("\t\t%c",TCROSSRIGHT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", TCROSSLEFT); 
-            printf("\t\t%c Name                      %c Matrikelnummer %c Geburtstag %c Eintrittsdatum %c Austrittsdatum %c\n", VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE);
-            printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT); 
-            return;
-        }
-        now=now->next;
-    }
-    printf("\t\t%c ",VERTICALLINE);
-    printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, sMatrikelnummer);
-    printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+    printf("\t\t%c",TCROSSRIGHT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", TCROSSLEFT); 
+    printf("\t\t%c Name                      %c Matrikelnummer %c Geburtstag %c Eintrittsdatum %c Austrittsdatum %c\n", VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE);
+    printf("\t\t%c %s", VERTICALLINE, now->surname); for(int i=0;i<(25-strlen(now->surname));i++) printf(" "); printf(" %c %d", VERTICALLINE, now->matrikelnummer); if(getLength(now->matrikelnummer)==6) printf(" "); for(int i=0;i<7;i++) printf(" "); printf(" %c %02d.%02d.%04d", VERTICALLINE, now->birthdate.day, now->birthdate.month, now->birthdate.year); printf(" %c %02d.%02d.%04d    ", VERTICALLINE, now->startdate.day, now->startdate.month, now->startdate.year); printf(" %c %02d.%02d.%04d     %c\n", VERTICALLINE, now->exitdate.day, now->exitdate.month, now->exitdate.year, VERTICALLINE); 
+    printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT); 
 }
+
 //Menü
 int menu(void){
     system("color");
     int pos=0;
     char input='o';
     do{
-        //system("cls");
+        system("cls");
         switch(input){
             case 'w':
                 pos==0?pos=5:pos--;
@@ -419,6 +442,7 @@ int main(void){
     init();
     //read();
     int select;
+    int search=0;
     do{
         select=menu();
         switch (select)
@@ -442,11 +466,12 @@ int main(void){
         break;
         case 2:
             {
-                int search;
+                system("cls");
                 printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
                 printf("\t\t%c Zu suchende Matrikelnummer: ", VERTICALLINE);
                 setMatrikel(&search);
                 printStudent(search);
+                search=0;
             }
             wait();
             //printStudent(Matrikelnummer)
@@ -470,5 +495,3 @@ int main(void){
     //save();
     return 0;
 }
-
-//der start und end pointer sind jetzt global

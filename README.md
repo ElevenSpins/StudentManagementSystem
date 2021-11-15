@@ -12,7 +12,7 @@
 
 ✓ Schreibe eine Funktion in der die Anzahl der gespeicherten Studenten zurueck gegeben werden soll.
 
-~ Schreibe eine Funktion printStudent(Matrikelnummer), mit der ein Student auf dem Bildschirm ausgegeben werden soll
+✓ Schreibe eine Funktion printStudent(Matrikelnummer), mit der ein Student auf dem Bildschirm ausgegeben werden soll
 
 - Schreibe eine Funktion printAllStudents, mit der alle Studenten Alphabetisch auf dem Bildschirm ausgegeben werden sollen.
 
