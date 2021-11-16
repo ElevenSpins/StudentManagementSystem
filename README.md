@@ -14,7 +14,7 @@
 
 ✓ Schreibe eine Funktion printStudent(Matrikelnummer), mit der ein Student auf dem Bildschirm ausgegeben werden soll
 
-- Schreibe eine Funktion printAllStudents, mit der alle Studenten Alphabetisch auf dem Bildschirm ausgegeben werden sollen.
+✓ Schreibe eine Funktion printAllStudents, mit der alle Studenten Alphabetisch auf dem Bildschirm ausgegeben werden sollen.
 
 ✓ Schreibe eine Funktion menue, ueber die die Verschienen funktionen aufgerufen werden sollen.
 
