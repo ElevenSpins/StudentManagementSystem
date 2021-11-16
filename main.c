@@ -49,7 +49,7 @@
 
 #define MENUMAX 54 //Wie größ das Menü sein soll (in der Breite)
 
-
+//unsigned in day, unsigned in month, unsigned in year
 struct date{
         unsigned int day;
         unsigned int month;
@@ -161,12 +161,9 @@ unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsi
 
 //Diese Funktion gibt den pointer auf den Studenten mit der Matrikelnummer zurück, wenn keiner gefunden wurde wird NULL returned! Diese Funktion testet nicht ob es bereits Einträge gibt 
 struct student *search(int sMatrikelnummer){
-    if(end->matrikelnummer==sMatrikelnummer){
-            return end;
-    }
     struct student *now;
     now=start;
-    while(now->next!=NULL){ //Der letzte Eintrag wird nicht getestet, da dort der Zeiger auf NULL zeigt!
+    while(now!=NULL){ //Solange now auf ein Element zeigt wird überprüft ob die Matrikelnummer übereinstimmt
         if(now->matrikelnummer==sMatrikelnummer){
             return now;
         }
@@ -362,9 +359,8 @@ int countStudent(void){
         return countStudent;
     }
     struct student *now;
-    countStudent++; //Da es einen Eintrag gibt (sonst wäre if(!start) ausgeführt worden)
     now=start; //Wir zeigen auf das aller erste Element
-    while(now->next!=NULL){ //Wir gucken ob das erste Element auf ein weiteres Zeigt (Dafür muss es bereit 1. Element geben)
+    while(now!=NULL){ //Solange now auf ein Element zeigt
         now=now->next;
         countStudent++;
     }
@@ -432,7 +428,7 @@ void deleteStudent(void){
         free(start);
         start=delNext;
     }
-    else if(del==end){ //Soll das letzte Element gelöscht werden ?
+    else if(del==end){ //Wenn das letze Element gelöscht werden soll
         delPrev=end->previous;
         delPrev->next=NULL;
         end=delPrev;
@@ -450,13 +446,12 @@ void deleteStudent(void){
 }
 
 //Wir benutzen merge sort in der top down variante
-
-//Bekommt zwei pointer auf den start zweier Listen
+//Bekommt zwei pointer auf den start zweier Listen, diese beiden Listen werden sortiert und zu einer Liste zusammen gesetzt, es wird ein pointer auf den start der zusammengesetzten Liste zurück gegeben
 struct student *merge(struct student *list1, struct student *list2) {
     struct student *head=NULL, **pp;
     pp = &head;
     while(TRUE){
-        if (strcmp(list1->surname, list2->surname) <= 0){ //Wenn das Element 
+        if (strcmp(list1->surname, list2->surname) <= 0){ //Wenn list1 mit a anfängt und list2 mit a oder b (nur ein Beispiel)
             *pp = list1; //*pp=liste1 == head=liste1 (aber nur im aller ersten durchlauf der while-Schleife!!!!) 
             pp = &list1->next; //pp wird zum pointer auf die Adresse vom nächsten Element 
             list1 = list1->next; //liste1 wird zum pointer auf das nächste Element
@@ -466,7 +461,7 @@ struct student *merge(struct student *list1, struct student *list2) {
             } //Da head jetzt auf das am anfang übergebene list1 Element zeigt wird head am Ende zurück gegeben, da man so über head->next auf das list2 Element kommt
         }
         else{
-            *pp = list2;
+            *pp = list2;    //Das selbe nur wenn list2 mit a anfängt und list1 mit b (nur ein Beispiel)
             pp = &list2->next;
             list2 = list2->next;
             if (list2 == NULL){
@@ -504,7 +499,7 @@ void sort(void){
     //Die Liste wird so sortiert, als ob es nur eine einfach verkettete Liste wäre
     start=msort(start);
     // previous Pointer sind jetzt komplett durcheinander, darum muss man diese wieder reparieren
-    // Der Pointer p1 ist immer vor p2 
+    // Der Pointer before ist immer vor now
     before=NULL;
     for (now=start; now; now=now->next) {   //Da now durch now=now->next am Ende der Liste zu NULL wird
         now->previous=before;
@@ -513,15 +508,16 @@ void sort(void){
     end=before;
 }
 
+//Gibt alle Stundenten in der Liste aus
 void printAllStudents(void){
-    printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
     if(!start){
+        printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
         printf("\t\t%c ",VERTICALLINE);
         printf(ERR "Es gibt noch keine Eintr%cge in der Datenbank!\n" RESET, ae);
         printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
         return;
     }
-    printf("\t\t%c",TCROSSRIGHT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", TCROSSLEFT); 
+    printf("\t\t%c",CORNERUPLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT); 
     printf("\t\t%c Name                      %c Matrikelnummer %c Geburtstag %c Eintrittsdatum %c Austrittsdatum %c\n", VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE);
     if(start==end){
         printf("\t\t%c %s", VERTICALLINE, start->surname); for(int i=0;i<(25-strlen(start->surname));i++) printf(" "); printf(" %c %d", VERTICALLINE, start->matrikelnummer); if(getLength(start->matrikelnummer)==6) printf(" "); for(int i=0;i<7;i++) printf(" "); printf(" %c %02d.%02d.%04d", VERTICALLINE, start->birthdate.day, start->birthdate.month, start->birthdate.year); printf(" %c %02d.%02d.%04d    ", VERTICALLINE, start->startdate.day, start->startdate.month, start->startdate.year); printf(" %c %02d.%02d.%04d     %c\n", VERTICALLINE, start->exitdate.day, start->exitdate.month, start->exitdate.year, VERTICALLINE);  
@@ -530,13 +526,10 @@ void printAllStudents(void){
         sort();
         struct student *now;
         now=start; //Wir zeigen auf das erste Element
-        while(now->next!=NULL){ //Wir gucken ob das erste Element auf ein weiteres Zeigt (Dafür muss es bereit 1. Element geben)
+        while(now!=NULL){ //Solange now noch auf ein Element zeigt
             printf("\t\t%c %s", VERTICALLINE, now->surname); for(int i=0;i<(25-strlen(now->surname));i++) printf(" "); printf(" %c %d", VERTICALLINE, now->matrikelnummer); if(getLength(now->matrikelnummer)==6) printf(" "); for(int i=0;i<7;i++) printf(" "); printf(" %c %02d.%02d.%04d", VERTICALLINE, now->birthdate.day, now->birthdate.month, now->birthdate.year); printf(" %c %02d.%02d.%04d    ", VERTICALLINE, now->startdate.day, now->startdate.month, now->startdate.year); printf(" %c %02d.%02d.%04d     %c\n", VERTICALLINE, now->exitdate.day, now->exitdate.month, now->exitdate.year, VERTICALLINE); 
             now=now->next;
         }
-        //Das letzte Element wird nicht mit ausgegeben, da die While-Schleife vorher abbricht
-        now=end;
-        printf("\t\t%c %s", VERTICALLINE, now->surname); for(int i=0;i<(25-strlen(now->surname));i++) printf(" "); printf(" %c %d", VERTICALLINE, now->matrikelnummer); if(getLength(now->matrikelnummer)==6) printf(" "); for(int i=0;i<7;i++) printf(" "); printf(" %c %02d.%02d.%04d", VERTICALLINE, now->birthdate.day, now->birthdate.month, now->birthdate.year); printf(" %c %02d.%02d.%04d    ", VERTICALLINE, now->startdate.day, now->startdate.month, now->startdate.year); printf(" %c %02d.%02d.%04d     %c\n", VERTICALLINE, now->exitdate.day, now->exitdate.month, now->exitdate.year, VERTICALLINE); 
     }
     printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
 }
