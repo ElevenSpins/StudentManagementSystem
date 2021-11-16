@@ -119,7 +119,7 @@ unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsi
         //Die Monate bis Juli, weil ab August die graden Monate die längeren Tage haben
         if(*month<=7){
             if(*month%2==0){
-                if(*month!=2 && *day<31){
+                if(*month!=2 && *day>30){
                     err=TRUE; //Haben max 30 Tage
                     printf("\t\t%c " ERR "Dieser Monat hat nicht so viele Tage!\n" RESET, VERTICALLINE);
                 }
@@ -449,6 +449,98 @@ void deleteStudent(void){
     printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
 }
 
+//Wir benutzen merge sort in der top down variante
+
+//Bekommt zwei pointer auf den start zweier Listen
+struct student *merge(struct student *list1, struct student *list2) {
+    struct student *head=NULL, **pp;
+    pp = &head;
+    while(TRUE){
+        if (strcmp(list1->surname, list2->surname) <= 0){ //Wenn das Element 
+            *pp = list1; //*pp=liste1 == head=liste1 (aber nur im aller ersten durchlauf der while-Schleife!!!!) 
+            pp = &list1->next; //pp wird zum pointer auf die Adresse vom nächsten Element 
+            list1 = list1->next; //liste1 wird zum pointer auf das nächste Element
+            if (list1 == NULL){ //Wenn liste1 nur einen Eintrag hat
+                *pp = list2; //liste1->next=list2
+                break;      //Wenn es also nur einen Eintrag in list1 gibt und der surname z.B. mit a anfängt und der surname in list2 mit a oder allem anderen beginnt, wird hier der list1 Eintrag vor den list2 Eintrag gesezt
+            } //Da head jetzt auf das am anfang übergebene list1 Element zeigt wird head am Ende zurück gegeben, da man so über head->next auf das list2 Element kommt
+        }
+        else{
+            *pp = list2;
+            pp = &list2->next;
+            list2 = list2->next;
+            if (list2 == NULL){
+                *pp = list1;
+                break;
+            }
+        }
+    }
+    return head;
+}
+
+//Bekommt einen Pointer, ab diesem Pointer wird die Liste sortiert 
+struct student *msort(struct student *sortStart){
+    struct student *now, *after;
+    //Wenn der pointer=Null ist oder die Liste auf die der Pointer verweist nur einen Eintrag ist ist die Liste bereits sortiert
+    if ((sortStart==NULL) || (sortStart->next==NULL)) return sortStart;
+    //Die Liste wird geteilt, um diese sortieren zu können, darum suchen wir mit dieser for-Schleife die Mitte der Liste ab den Eintrag auf den sortStart zeigt
+    //Dabei geht now immer einen Eintrag weiter, währen after immer zwei Einträge weiter geht, wenn z.B. after->next==NULL ist wird die Schleife abgebrochen, weil after dann am letzen Eintrag angekommen ist.
+    //(Das passiert wenn die Anzahl der Elemente ab sortStart grade ist.)
+    //Wenn die Liste ab sortStart ungrade ist, währe after->next->next=NULL, wenn man am vorletzen Element währe, dadurch würde die SChleife auch abgebrochen werden, da jetzt after==NULL ist 
+    for (now=sortStart, after=sortStart->next; after && after->next; after=after->next->next) now=now->next;
+    /* split the list at mid-point */
+    after=now->next;
+    now->next=NULL;//Die Liste wird zwischen now und after getrennt, man kann also nur noch von after->previous zurück kommen
+    now=sortStart; //now wird jetzt zum sortStart, aber die Liste die man jetzt ab sortStart abrufen kann ist nur noch halb so lang
+    /* sort the sublists recursively */
+    now=msort(now);
+    after=msort(after);
+    return merge(now, after);
+}
+
+//Sortiert die Liste
+void sort(void){
+    struct student *now, *before; //now ist ein pointer auf den jetzigen Listeneintrag, before ist ein pointer auf den Eintrag vor dem now Eintrag
+    //Die Liste wird so sortiert, als ob es nur eine einfach verkettete Liste wäre
+    start=msort(start);
+    // previous Pointer sind jetzt komplett durcheinander, darum muss man diese wieder reparieren
+    // Der Pointer p1 ist immer vor p2 
+    before=NULL;
+    for (now=start; now; now=now->next) {   //Da now durch now=now->next am Ende der Liste zu NULL wird
+        now->previous=before;
+        before=now;
+    }
+    end=before;
+}
+
+void printAllStudents(void){
+    printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+    if(!start){
+        printf("\t\t%c ",VERTICALLINE);
+        printf(ERR "Es gibt noch keine Eintr%cge in der Datenbank!\n" RESET, ae);
+        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+        return;
+    }
+    printf("\t\t%c",TCROSSRIGHT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", TCROSSLEFT); 
+    printf("\t\t%c Name                      %c Matrikelnummer %c Geburtstag %c Eintrittsdatum %c Austrittsdatum %c\n", VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE);
+    if(start==end){
+        printf("\t\t%c %s", VERTICALLINE, start->surname); for(int i=0;i<(25-strlen(start->surname));i++) printf(" "); printf(" %c %d", VERTICALLINE, start->matrikelnummer); if(getLength(start->matrikelnummer)==6) printf(" "); for(int i=0;i<7;i++) printf(" "); printf(" %c %02d.%02d.%04d", VERTICALLINE, start->birthdate.day, start->birthdate.month, start->birthdate.year); printf(" %c %02d.%02d.%04d    ", VERTICALLINE, start->startdate.day, start->startdate.month, start->startdate.year); printf(" %c %02d.%02d.%04d     %c\n", VERTICALLINE, start->exitdate.day, start->exitdate.month, start->exitdate.year, VERTICALLINE);  
+    }
+    else{
+        sort();
+        struct student *now;
+        now=start; //Wir zeigen auf das erste Element
+        while(now->next!=NULL){ //Wir gucken ob das erste Element auf ein weiteres Zeigt (Dafür muss es bereit 1. Element geben)
+            printf("\t\t%c %s", VERTICALLINE, now->surname); for(int i=0;i<(25-strlen(now->surname));i++) printf(" "); printf(" %c %d", VERTICALLINE, now->matrikelnummer); if(getLength(now->matrikelnummer)==6) printf(" "); for(int i=0;i<7;i++) printf(" "); printf(" %c %02d.%02d.%04d", VERTICALLINE, now->birthdate.day, now->birthdate.month, now->birthdate.year); printf(" %c %02d.%02d.%04d    ", VERTICALLINE, now->startdate.day, now->startdate.month, now->startdate.year); printf(" %c %02d.%02d.%04d     %c\n", VERTICALLINE, now->exitdate.day, now->exitdate.month, now->exitdate.year, VERTICALLINE); 
+            now=now->next;
+        }
+        //Das letzte Element wird nicht mit ausgegeben, da die While-Schleife vorher abbricht
+        now=end;
+        printf("\t\t%c %s", VERTICALLINE, now->surname); for(int i=0;i<(25-strlen(now->surname));i++) printf(" "); printf(" %c %d", VERTICALLINE, now->matrikelnummer); if(getLength(now->matrikelnummer)==6) printf(" "); for(int i=0;i<7;i++) printf(" "); printf(" %c %02d.%02d.%04d", VERTICALLINE, now->birthdate.day, now->birthdate.month, now->birthdate.year); printf(" %c %02d.%02d.%04d    ", VERTICALLINE, now->startdate.day, now->startdate.month, now->startdate.year); printf(" %c %02d.%02d.%04d     %c\n", VERTICALLINE, now->exitdate.day, now->exitdate.month, now->exitdate.year, VERTICALLINE); 
+    }
+    printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+}
+
 //Menü
 int menu(void){
     int pos=0;
@@ -502,36 +594,29 @@ int main(void){
         break;
         case 1:
             //Schöne Ausgabe
-            {
-                system("cls");
-                printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
-                int len=3;
-                int count=countStudent();
-                len=4-getLength(count);
-                printf("\t\t%c Es befinden sich " IMPORTANTTEXT "%d" RESET, VERTICALLINE, count);  printf(" Eintr%cge in der Datenbank!     ", ae); for(int i=0;i<len;i++) printf(" "); printf("%c\n", VERTICALLINE);
-                printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
-            }
-            //countStudent(); Ohne pointer, da in der Aufgabe steht, dass diese Funktion einen Wert zurück gibt
+            system("cls");
+            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+            int len=3;
+            int count=countStudent();
+            len=4-getLength(count);
+            printf("\t\t%c Es befinden sich " IMPORTANTTEXT "%d" RESET, VERTICALLINE, count);  printf(" Eintr%cge in der Datenbank!     ", ae); for(int i=0;i<len;i++) printf(" "); printf("%c\n", VERTICALLINE);
+            printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
             wait();
         break;
         case 2:
-            {
-                system("cls");
-                printStudent();
-            }
+            system("cls");
+            printStudent();
             wait();
-            //printStudent(Matrikelnummer)
         break;
         case 3:
-            //printAllStudents()
+            system("cls");
+            printAllStudents();
+            wait();
         break;
         case 4:
-            {
-                system("cls");
-                deleteStudent();
-            }
+            system("cls");
+            deleteStudent();
             wait();
-            //deleteStudent(Matrikelnummer)
         break;
         
         case 5:
