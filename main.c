@@ -936,7 +936,14 @@ void save(void){
     FILE *db;
     db=fopen("studentDB.csv","w");
     if(!db) return;
-
+    struct student *now=start;
+    while(now){
+        fprintf(db, "%s,%d,%02d.%02d.%04d,%02d.%02d.%04d,%02d.%02d.%04d", now->surname, now->matrikelnummer, now->startdate.day, now->startdate.month, now->startdate.year, now->exitdate.day, now->exitdate.month, now->exitdate.year, now->birthdate.day, now->birthdate.month, now->birthdate.year);
+        now=now->next;
+        if(now){
+            fprintf(db, "\n");
+        }
+    }
     fclose(db);
 }
 
@@ -981,7 +988,6 @@ int menu(void){
 int main(void){
     system("color");
     read();
-    wait();
     system("cls");
     int select;
     do{
@@ -1029,6 +1035,7 @@ int main(void){
         break;
         }
     }while(select!=5);
-    //save();
+    save();
+    system("cls");
     return 0;
 }
