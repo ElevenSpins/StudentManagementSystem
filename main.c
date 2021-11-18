@@ -26,7 +26,7 @@
 
 //Farbzuweisung
 #define ERR RED //Funktioniert in der .exe nur mit <windows.h> und wenn man system(color...) benutzt hat.
-#define COLORARROW GREEN
+#define SUCCESS GREEN
 #define IMPORTANTTEXT CYAN
 
 #define TRUE 1
@@ -80,7 +80,7 @@ int getLength(int nummer){
     return (floor(log10(abs(nummer))) + 1);
 }
 
-//Überprüft ob ein eingegebenes Datum ein echtes Datum ist.
+//Überprüft ob ein eingegebenes Datum ein echtes Datum ist. Returned FALSE wenn das Datum richtig ist, TRUE wenn es falsch ist!
 unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsigned int *year){
     unsigned char err=TRUE;
     unsigned char leap=FALSE;
@@ -293,7 +293,7 @@ void inputStudent(void){
 
     unsigned int    startday, startmonth, startyear,
                     exitday, exitmonth, exityear,
-                    birthday, birhtmonth, birhtyear;
+                    birthday, birthmonth, birthyear;
 
     unsigned char err=TRUE;
     printf("\t\t%c Nachname: ", VERTICALLINE);
@@ -333,8 +333,8 @@ void inputStudent(void){
         do{
             scanf("%10s", in_birthdate);
             fflush(stdin);
-        }while(checkDate(in_birthdate, &birthday, &birhtmonth, &birhtyear));
-        if(birhtyear<startyear){
+        }while(checkDate(in_birthdate, &birthday, &birthmonth, &birthyear));
+        if(birthyear<startyear){
             if(startyear<exityear){
                 err=FALSE;
             }
@@ -349,7 +349,7 @@ void inputStudent(void){
             printf("\t\t%c " ERR "Die Daten sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, VERTICALLINE, ue);
         }
     }while(err);
-    addStudent(in_surname, &in_matrikelnummer, &startday, &startmonth, &startyear, &exitday, &exitmonth, &exityear, &birthday, &birhtmonth, &birhtyear);
+    addStudent(in_surname, &in_matrikelnummer, &startday, &startmonth, &startyear, &exitday, &exitmonth, &exityear, &birthday, &birthmonth, &birthyear);
 }
 
 //Gibt die Anzahl der gespeicherten Studenten zurück
@@ -534,6 +534,412 @@ void printAllStudents(void){
     printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
 }
 
+void read(void){
+    //Variablen zum Einlesen der Datei
+    FILE *db;
+    char row[256];
+    char *split; //Welches Zeichen die csv Datei einteilt
+
+    //Variablen zum richtigen Zuordnen der eingelesenen Werte
+    int order[5]={0,1,2,3,4}; //0=surname, 1=matrikelnummer, 2=startdate, 3=exitdate, 4=birthdate
+    int run=0;
+    int err_run=0; //Sagt wie oft in der header Line abfrage das else{} durchlaufen ist
+    int line=0;
+    int c_null=0;
+    //Variablen zur übergabe an addStudent()
+    char in_surname[25]; //max 24 Zeichen
+    int in_matrikelnummer; //Darf nur 6 oder 7 Zeichen lang sein
+    char in_startdate[11]; //11 wegen DD.MM.YYYY + \0
+    char in_exitdate[11];
+    char in_birthdate[11];
+    unsigned int    startday, startmonth, startyear,
+                    exitday, exitmonth, exityear,
+                    birthday, birthmonth, birthyear;
+    unsigned char err=TRUE; //Wird genutzt um do-while Schleifen zu loopen, wenn der Nutzer fehlerhafte Eingaben tätigt
+    unsigned char did_err=FALSE; //Sagt ob es in einem switch case einen Fehler gab (Für die Ausgabe der Fehler Nachricht)
+    //------------------------------------------------------
+    db=fopen("studentDB.csv","r");
+    if(!db) return; //Wenn die Datei nicht existiert return
+    printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX+20;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+    //Test ob die erste Zeile der csv ein header ist, wenn nicht werden alle Einträge wie folgt eingelesen: surname, matrikelnummer, startdate, exitdate, birthdate 
+    if(!feof(db)){
+        fgets(row,100,db);
+        split=strtok(row, ",");
+        run=0;
+        while(split){
+            if(row[0]=='\n') break;
+            if(run==4){
+                for(int i=0;i<25;i++){
+                    if(split[i]=='\n'){
+                        split[i]='\0';
+                    break;
+                    }
+                }
+            }
+            if(!strcmp(split,"surname")){
+                order[run]=0;
+            }
+            else if(!strcmp(split,"matrikelnummer")){
+                order[run]=1;
+            }
+            else if(!strcmp(split,"startdate")){
+                order[run]=2;
+            }
+            else if(!strcmp(split,"exitdate")){
+                order[run]=3;
+            }
+            else if(!strcmp(split,"birthdate")){
+                order[run]=4;
+            }
+            else{
+                for(int i=0;i<5;i++) order[i]=i;
+                if(run==err_run){
+                    switch(order[run]){
+                        case 0:
+                            c_null=0;                          
+                            while(split[c_null]!='\0') c_null++;
+                            if(c_null>24) split[24]='\0';
+                            strcpy(in_surname,split);
+                        break;
+                        case 1:
+                            err=FALSE;
+                            in_matrikelnummer=atoi(split);
+                            do{
+                                do{
+                                    if(err){
+                                        setMatrikel(&in_matrikelnummer);
+                                        err=FALSE;
+                                    }
+                                    else{
+                                        int matrikelLength=getLength(in_matrikelnummer);
+                                        if(!(5<matrikelLength && matrikelLength<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
+                                            err=TRUE;
+                                            printf("\t\t%c ",VERTICALLINE);
+                                            printf(ERR "Die Matrikelnummer darf nur zwischen 6 und 7 Stellen lang sein!\n" RESET);
+                                            printf("\t\t%c ",VERTICALLINE);
+                                            printf("Bitte geben Sie die Nummer erneut ein: ");
+                                            did_err=TRUE;
+                                        }
+                                    }
+                                }while(err);
+                                err=TRUE;
+                                if(!start) err=FALSE; //Muss getestet werden, da search das nicht macht, ohne diesen Test würde search abstürzen (Absturz da end=NULL führt zu NULL->matrikelnummer)
+                                else{
+                                    if(!search(in_matrikelnummer)) err=FALSE;
+                                    else{
+                                        printf("\t\t%c " ERR "Es gibt bereits einen Studenten mit dieser Matrikelnummer!" RESET "\n\t\t%c Bitte geben Sie eine neue Nummer ein: ", VERTICALLINE, VERTICALLINE);
+                                        did_err=TRUE;
+                                    }
+                                }
+                            }while(err);
+                            if(did_err){
+                                printf("\t\t%c " ERR "Dieser Fehler wurde durch die .csv Datei erzeugt!\n" RESET, VERTICALLINE);
+                                printf("\t\t%c " ERR "Position des Fehlers: (Zeile: %d / Spalte: %d)\n" RESET, VERTICALLINE, line+1, run+1);
+                                did_err=FALSE;
+                            }
+                        break;
+                        case 2:
+                            if(split[10]!='\0') split[10]='\0';
+                            strcpy(in_startdate,split);
+                            while(checkDate(in_startdate, &startday, &startmonth, &startyear)){
+                                printf("(Eintrittsdatum) ");
+                                scanf("%10s", in_startdate);
+                                fflush(stdin);
+                                did_err=TRUE;
+                            }
+                            if(did_err){
+                                printf("\t\t%c " ERR "Dieser Fehler wurde durch die .csv Datei erzeugt!\n" RESET, VERTICALLINE);
+                                printf("\t\t%c " ERR "Position des Fehlers: (Zeile: %d / Spalte: %d)\n" RESET, VERTICALLINE, line+1, run+1);
+                                did_err=FALSE;
+                            }
+                        break;
+                        case 3:
+                            if(split[10]!='\0') split[10]='\0';
+                            strcpy(in_exitdate,split);
+                            while(checkDate(in_exitdate, &exitday, &exitmonth, &exityear)){
+                                printf("(Austrittsdatum) ");
+                                scanf("%10s", in_exitdate);
+                                fflush(stdin);
+                                did_err=TRUE;
+                            }
+                            if(did_err){
+                                printf("\t\t%c " ERR "Dieser Fehler wurde durch die .csv Datei erzeugt!\n" RESET, VERTICALLINE);
+                                printf("\t\t%c " ERR "Position des Fehlers: (Zeile: %d / Spalte: %d)\n" RESET, VERTICALLINE, line+1, run+1);
+                                did_err=FALSE;
+                            }
+                        break;
+                        case 4:
+                            if(split[10]!='\0') split[10]='\0';
+                            strcpy(in_birthdate,split);
+                            while(checkDate(in_birthdate, &birthday, &birthmonth, &birthyear)){
+                                printf("(Geburtsdatum) ");
+                                scanf("%10s", in_birthdate);
+                                fflush(stdin);
+                                did_err=TRUE;
+                            }
+                            if(did_err){
+                                printf("\t\t%c " ERR "Dieser Fehler wurde durch die .csv Datei erzeugt!\n" RESET, VERTICALLINE);
+                                printf("\t\t%c " ERR "Position des Fehlers: (Zeile: %d / Spalte: %d)\n" RESET, VERTICALLINE, line+1, run+1);
+                                did_err=FALSE;
+                            }
+                        break;
+                    }
+                }
+                err_run++;
+            }
+            run++;
+            split=strtok(NULL, ",");
+        }
+    }
+    else{
+        fclose(db);
+        return;
+    }
+    if(row[0]!='\n'){
+        if(err_run==run){
+            err=TRUE;
+            if(birthyear<startyear){
+                if(startyear<exityear){
+                    err=FALSE;
+                }
+                else if(startyear==exityear && startmonth<exitmonth){
+                    err=FALSE;
+                }
+                else if(startyear==exityear && startmonth==exitmonth && startday<=exitday){
+                    err=FALSE;
+                }
+            }
+            if(err){
+                printf("\t\t%c " ERR "Die Daten in Zeile %d sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, VERTICALLINE, line+1, ue);
+            }
+            while(err){
+                err=TRUE;
+                printf("\t\t%c Eintrittsdatum (DD.MM.YYYY): ", VERTICALLINE);
+                do{
+                    scanf("%10s", in_startdate);
+                    fflush(stdin);
+                }while(checkDate(in_startdate, &startday, &startmonth, &startyear));
+    
+                printf("\t\t%c Austrittsdatum (DD.MM.YYYY): ", VERTICALLINE);
+                do{
+                    scanf("%10s", in_exitdate);
+                    fflush(stdin);
+                }while(checkDate(in_exitdate, &exitday, &exitmonth, &exityear));
+
+                printf("\t\t%c Geburtstag (DD.MM.YYYY): ", VERTICALLINE);
+                do{
+                    scanf("%10s", in_birthdate);
+                    fflush(stdin);
+                }while(checkDate(in_birthdate, &birthday, &birthmonth, &birthyear));
+                if(birthyear<startyear){
+                    if(startyear<exityear){
+                        err=FALSE;
+                    }
+                    else if(startyear==exityear && startmonth<exitmonth){
+                        err=FALSE;
+                    }
+                    else if(startyear==exityear && startmonth==exitmonth && startday<=exitday){
+                        err=FALSE;
+                    }
+                }
+                if(err){
+                    printf("\t\t%c " ERR "Die Daten in Zeile %d sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, VERTICALLINE, line+1, ue);
+                }
+            }
+            addStudent(in_surname, &in_matrikelnummer, &startday, &startmonth, &startyear, &exitday, &exitmonth, &exityear, &birthday, &birthmonth, &birthyear);
+            printf("\t\t%c " SUCCESS "Zeile %d konnte eingelesen werden!\n" RESET, VERTICALLINE, line+1);
+        }
+        else if(err_run==0 && (order[0]+order[1]+order[2]+order[3]+order[4])==10){
+            printf("\t\t%c " SUCCESS "Die header Zeile konnte erfolgreich gelesen werden!\n" RESET, VERTICALLINE);
+            printf("\t\t%c " SUCCESS "Einlese Array: %d %d %d %d %d\n" RESET, VERTICALLINE, order[0], order[1], order[2], order[3], order[4]);
+        }
+    }
+    else{
+        printf("\t\t%c " ERR "Die .csv Datei hat eine fehlerhafte header Zeile!\n" RESET, VERTICALLINE);
+        for(int i=0;i<5;i++) order[i]=i;
+        printf("\t\t%c " ERR "Einlese Array ge%cndert zu: %d %d %d %d %d\n" RESET, VERTICALLINE, ae, order[0], order[1], order[2], order[3], order[4]);
+    }
+    line++;
+
+    //Einlesen der restlichen Zeilen in der .csv Datei -----------------------------------
+    while(!feof(db)){
+        fgets(row,60,db);
+        split=strtok(row, ",");
+        run=0;
+        while(split){
+            if(row[0]=='\n') break;
+            if(run==4){
+                for(int i=0;i<25;i++){
+                    if(split[i]=='\n'){
+                        split[i]='\0';
+                    break;
+                    }
+                }
+            }
+            switch(order[run]){
+                case 0:
+                    c_null=0;
+                    while(split[c_null]!='\0') c_null++;
+                    if(c_null>24) split[24]='\0';
+                    strcpy(in_surname,split);
+                break;
+                case 1:
+                    err=FALSE;
+                    in_matrikelnummer=atoi(split);
+                    do{
+                        do{
+                            if(err){
+                                setMatrikel(&in_matrikelnummer);
+                                err=FALSE;
+                            }
+                            else{
+                                int matrikelLength=getLength(in_matrikelnummer);
+                                if(!(5<matrikelLength && matrikelLength<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
+                                    err=TRUE;
+                                    printf("\t\t%c ",VERTICALLINE);
+                                    printf(ERR "Die Matrikelnummer darf nur zwischen 6 und 7 Stellen lang sein!\n" RESET);
+                                    printf("\t\t%c ",VERTICALLINE);
+                                    printf("Bitte geben Sie die Nummer erneut ein: ");
+                                    did_err=TRUE;
+                                }
+                            }
+                        }while(err);
+                        err=TRUE;
+                        if(!start) err=FALSE; //Muss getestet werden, da search das nicht macht, ohne diesen Test würde search abstürzen (Absturz da end=NULL führt zu NULL->matrikelnummer)
+                        else{
+                            if(!search(in_matrikelnummer)) err=FALSE;
+                            else{
+                                printf("\t\t%c " ERR "Es gibt bereits einen Studenten mit dieser Matrikelnummer!" RESET "\n\t\t%c Bitte geben Sie eine neue Nummer ein: ", VERTICALLINE, VERTICALLINE);
+                                did_err=TRUE;
+                            }
+                        }
+                    }while(err);
+                    if(did_err){
+                        printf("\t\t%c " ERR "Dieser Fehler wurde durch die .csv Datei erzeugt!\n" RESET, VERTICALLINE);
+                        printf("\t\t%c " ERR "Position des Fehlers: (Zeile: %d / Spalte: %d)\n" RESET, VERTICALLINE, line+1, run+1);
+                        did_err=FALSE;
+                    }
+                break;
+                case 2:
+                    if(split[10]!='\0') split[10]='\0';
+                    strcpy(in_startdate,split);
+                    while(checkDate(in_startdate, &startday, &startmonth, &startyear)){
+                        printf("(Eintrittsdatum) ");
+                        scanf("%10s", in_startdate);
+                        fflush(stdin);
+                        did_err=TRUE;
+                    }
+                    if(did_err){
+                        printf("\t\t%c " ERR "Dieser Fehler wurde durch die .csv Datei erzeugt!\n" RESET, VERTICALLINE);
+                        printf("\t\t%c " ERR "Position des Fehlers: (Zeile: %d / Spalte: %d)\n" RESET, VERTICALLINE, line+1, run+1);
+                        did_err=FALSE;
+                    }
+                break;
+                case 3:
+                    if(split[10]!='\0') split[10]='\0';
+                    strcpy(in_exitdate,split);
+                    while(checkDate(in_exitdate, &exitday, &exitmonth, &exityear)){
+                        printf("(Austrittsdatum) ");
+                        scanf("%10s", in_exitdate);
+                        fflush(stdin);
+                        did_err=TRUE;
+                    }
+                    if(did_err){
+                        printf("\t\t%c " ERR "Dieser Fehler wurde durch die .csv Datei erzeugt!\n" RESET, VERTICALLINE);
+                        printf("\t\t%c " ERR "Position des Fehlers: (Zeile: %d / Spalte: %d)\n" RESET, VERTICALLINE, line+1, run+1);
+                        did_err=FALSE;
+                    }
+                break;
+                case 4:
+                    if(split[10]!='\0') split[10]='\0';
+                    strcpy(in_birthdate,split);
+                    while(checkDate(in_birthdate, &birthday, &birthmonth, &birthyear)){
+                        printf("Geburtsdatum) ");
+                        scanf("%10s", in_birthdate);
+                        fflush(stdin);
+                        did_err=TRUE;
+                    }
+                    if(did_err){
+                        printf("\t\t%c " ERR "Dieser Fehler wurde durch die .csv Datei erzeugt!\n" RESET, VERTICALLINE);
+                        printf("\t\t%c " ERR "Position des Fehlers: (Zeile: %d / Spalte: %d)\n" RESET, VERTICALLINE, line+1, run+1);
+                        did_err=FALSE;
+                    }
+                break;
+            }
+            run++;
+            split=strtok(NULL, ",");
+        }
+        err=TRUE;
+        if(row[0]!='\n'){
+            if(birthyear<startyear){
+                if(startyear<exityear){
+                    err=FALSE;
+                }
+                else if(startyear==exityear && startmonth<exitmonth){
+                    err=FALSE;
+                }
+                else if(startyear==exityear && startmonth==exitmonth && startday<=exitday){
+                    err=FALSE;
+                }
+            }
+            if(err){
+                printf("\t\t%c " ERR "Die Daten in Zeile %d sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, VERTICALLINE, line+1, ue);
+            }
+            while(err){
+                err=TRUE;
+                printf("\t\t%c Eintrittsdatum (DD.MM.YYYY): ", VERTICALLINE);
+                do{
+                    scanf("%10s", in_startdate);
+                    fflush(stdin);
+                }while(checkDate(in_startdate, &startday, &startmonth, &startyear));
+    
+                printf("\t\t%c Austrittsdatum (DD.MM.YYYY): ", VERTICALLINE);
+                do{
+                    scanf("%10s", in_exitdate);
+                    fflush(stdin);
+                }while(checkDate(in_exitdate, &exitday, &exitmonth, &exityear));
+
+                printf("\t\t%c Geburtstag (DD.MM.YYYY): ", VERTICALLINE);
+                do{
+                    scanf("%10s", in_birthdate);
+                    fflush(stdin);
+                }while(checkDate(in_birthdate, &birthday, &birthmonth, &birthyear));
+                if(birthyear<startyear){
+                    if(startyear<exityear){
+                        err=FALSE;
+                    }
+                    else if(startyear==exityear && startmonth<exitmonth){
+                        err=FALSE;
+                    }
+                    else if(startyear==exityear && startmonth==exitmonth && startday<=exitday){
+                        err=FALSE;
+                    }
+                }
+                if(err){
+                    printf("\t\t%c " ERR "Die Daten in Zeile %d sind widerspr%cchlich, bitte geben Sie die Daten nochmal ein!\n" RESET, VERTICALLINE, line+1, ue);
+                }
+            }
+            addStudent(in_surname, &in_matrikelnummer, &startday, &startmonth, &startyear, &exitday, &exitmonth, &exityear, &birthday, &birthmonth, &birthyear);
+            printf("\t\t%c " SUCCESS "Zeile %d konnte eingelesen werden!\n" RESET, VERTICALLINE, line+1);
+            line++;
+        }
+        else{
+            printf("\t\t%c " ERR "Zeile %d ist leer!\n" RESET, VERTICALLINE, line+1);
+        }
+    }
+    
+    fclose(db);
+    printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX+20;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+}
+
+void save(void){
+    FILE *db;
+    db=fopen("studentDB.csv","w");
+    if(!db) return;
+
+    fclose(db);
+}
+
 //Menü
 int menu(void){
     int pos=0;
@@ -573,8 +979,10 @@ int menu(void){
 
 //Main
 int main(void){
-    //read();
     system("color");
+    read();
+    wait();
+    system("cls");
     int select;
     do{
         select=menu();
