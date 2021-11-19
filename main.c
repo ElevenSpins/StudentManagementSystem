@@ -4,7 +4,6 @@
 #include <math.h> //Damit log() funktioniert
 #include <conio.h> //Damit getch() funktioniert
 #include <windows.h>
-#include <wserovfkdlkelrfkldlökgre.h>
 
 //Umlaute, um diese in der Konsole ausgeben zu können
 #define sss 0xe1 // ß
