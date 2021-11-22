@@ -109,6 +109,23 @@ unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsi
     }
     //Zweiter Check ob das Datum überhaupt Sinn macht
     if(!err){
+        if(*year<=0){
+            err=TRUE;
+            printf("\t\t%c " ERR "Das Jahr kann nicht <=0 sein!\n" RESET, VERTICALLINE);
+        }
+        if(*day<=0){
+            err=TRUE;
+            printf("\t\t%c " ERR "Der Tag kann nicht <=0 sein!\n" RESET, VERTICALLINE);
+        }
+        if(*month<=0){
+            err=TRUE;
+            printf("\t\t%c " ERR "Der Monat kann nicht <=0 sein!\n" RESET, VERTICALLINE);
+        }
+    }
+
+
+
+    if(!err){
         //Checken ob das Jahr ein Schaltjahr ist
         if(*year % 4 == 0){
             if(*year % 100 == 0) leap=(*year%400==0)?TRUE:FALSE;
