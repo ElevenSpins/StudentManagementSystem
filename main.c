@@ -10,7 +10,6 @@
 #define oe 0x94 // ö
 #define ae 0x84 // ä
 #define ue 0x81 // ü
-
 #define UE 0x9a // Ü
 
 //Farben
@@ -29,23 +28,23 @@
 #define SUCCESS GREEN
 #define IMPORTANTTEXT CYAN
 
+//True False
 #define TRUE 1
 #define FALSE 0
 
 #define MENU_ARROW 0x1a //Pfeil der nach rechts zeigt
 #define SPACE 0x20 //Leerzeichen
-
-#define HORIZONLINE 0xcd
-#define VERTICALLINE 0xba
-#define CROSS 0xce
-#define CORNERDOWNLEFT 0xc8
-#define CORNERDOWNRIGHT 0xbc
-#define CORNERUPLEFT 0xc9
-#define CORNERUPRIGHT 0xbb
-#define TCROSSUP 0xca
-#define TCROSSDOWN 0xcb
-#define TCROSSRIGHT 0xcc
-#define TCROSSLEFT 0xb9
+#define HORIZONLINE 0xcd // ═
+#define VERTICALLINE 0xba // ║
+#define CROSS 0xce // ╬
+#define CORNERDOWNLEFT 0xc8 // ╚
+#define CORNERDOWNRIGHT 0xbc // ╝
+#define CORNERUPLEFT 0xc9 // ╔
+#define CORNERUPRIGHT 0xbb // ╗
+#define TCROSSUP 0xca // ╩
+#define TCROSSDOWN 0xcb // ╦
+#define TCROSSRIGHT 0xcc // ╠
+#define TCROSSLEFT 0xb9 // ╣
 
 #define MENUMAX 54 //Wie größ das Menü sein soll (in der Breite)
 
@@ -160,11 +159,11 @@ unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsi
 }
 
 //Diese Funktion gibt den pointer auf den Studenten mit der Matrikelnummer zurück, wenn keiner gefunden wurde wird NULL returned! Diese Funktion testet nicht ob es bereits Einträge gibt 
-struct student *search(int sMatrikelnummer){
+struct student *search(int s_matrikelnummer){
     struct student *now;
     now=start;
     while(now!=NULL){ //Solange now auf ein Element zeigt wird überprüft ob die Matrikelnummer übereinstimmt
-        if(now->matrikelnummer==sMatrikelnummer){
+        if(now->matrikelnummer==s_matrikelnummer){
             return now;
         }
         now=now->next;
@@ -173,13 +172,13 @@ struct student *search(int sMatrikelnummer){
 }
 
 //Checkt ob die Matrikelnummer zwischen 6 und 7 Ziffern lang ist und speichert die Nummer dann in der Variable auf den der Pointer zeigt
-void setMatrikel(int *pMatrikelnummer){
+void setMatrikel(int *p_matrikelnummer){
     unsigned char err=TRUE;
     do{
-        scanf("%d", pMatrikelnummer);
+        scanf("%d", p_matrikelnummer);
         fflush(stdin);
-        int matrikelLength=getLength(*pMatrikelnummer);
-        if(!(5<matrikelLength && matrikelLength<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
+        int matrikel_length=getLength(*p_matrikelnummer);
+        if(!(5<matrikel_length && matrikel_length<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
             err=TRUE;
             printf("\t\t%c ",VERTICALLINE);
             printf(ERR "Die Matrikelnummer darf nur zwischen 6 und 7 Stellen lang sein!\n" RESET);
@@ -354,22 +353,22 @@ void inputStudent(void){
 
 //Gibt die Anzahl der gespeicherten Studenten zurück
 int countStudent(void){
-    int countStudent=0;
+    int student_count=0; //Anzahl der Studenten
     if(!start){
-        return countStudent;
+        return student_count;
     }
     struct student *now;
     now=start; //Wir zeigen auf das aller erste Element
     while(now!=NULL){ //Solange now auf ein Element zeigt
         now=now->next;
-        countStudent++;
+        student_count++;
     }
-    return countStudent;
+    return student_count;
 }
 
 //Gibt den Studenten mit der gesuchten Matrikelnummer aus
 void printStudent(void){
-    int sMatrikelnummer;
+    int s_matrikelnummer;
     printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
     if(!start){
         printf("\t\t%c ",VERTICALLINE);
@@ -378,11 +377,11 @@ void printStudent(void){
         return;
     }
     printf("\t\t%c Zu suchende Matrikelnummer: ", VERTICALLINE);
-    setMatrikel(&sMatrikelnummer);
-    struct student *now=search(sMatrikelnummer);
+    setMatrikel(&s_matrikelnummer);
+    struct student *now=search(s_matrikelnummer);
     if(!now){
         printf("\t\t%c ",VERTICALLINE);
-        printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, sMatrikelnummer);
+        printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, s_matrikelnummer);
         printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
         return;
     }
@@ -394,7 +393,7 @@ void printStudent(void){
 
 //Löscht den Studenten mit der gesuchten Matrikelnummer
 void deleteStudent(void){
-    int sMatrikelnummer;
+    int s_matrikelnummer; //Die zu suchende Matrikelnummer
     printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
     if(!start){
         printf("\t\t%c ",VERTICALLINE);
@@ -403,20 +402,21 @@ void deleteStudent(void){
         return;
     }
     printf("\t\t%c Zu l%cschende Matrikelnummer: ", VERTICALLINE, oe);
-    setMatrikel(&sMatrikelnummer);
-    struct student *del=search(sMatrikelnummer);
-    struct student *delNext=NULL; //delNext wird als pointer auf das nächste Element nach del genutzt 
-    struct student *delPrev=NULL; //delPrev wird als pointer auf das Element vor dem zu löschenden genutzt
+    setMatrikel(&s_matrikelnummer); //Einlesen der zu löschenden Matrikelnummer (in setMatrikel wird auch direkt überprüft ob diese Sinn macht)
+    struct student *del=search(s_matrikelnummer);
+    struct student *del_next=NULL; //del_next wird als pointer auf das nächste Element nach del genutzt 
+    struct student *del_prev=NULL; //del_prev wird als pointer auf das Element vor dem zu löschenden genutzt
     if(!del){
         printf("\t\t%c ",VERTICALLINE);
-        printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, sMatrikelnummer);
+        printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, s_matrikelnummer);
         printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
         return;
     }
     /*LÖSCHEN*/
     if(del==start){ //Soll das erste Element gelöscht werden 
-        delNext=start->next;
-        if(!delNext){ //Falls es nach dem ersten Element keine weiteren 
+        del_next=start->next;
+        if(!del_next){ //Falls es nach dem ersten Element keine weiteren
+            free(start->surname); 
             free(start);
             start=NULL;
             end=NULL;
@@ -424,21 +424,24 @@ void deleteStudent(void){
             printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
             return;
         }
-        delNext->previous=NULL;
+        del_next->previous=NULL;
+        free(start->surname);
         free(start);
-        start=delNext;
+        start=del_next;
     }
     else if(del==end){ //Wenn das letze Element gelöscht werden soll
-        delPrev=end->previous;
-        delPrev->next=NULL;
-        end=delPrev;
+        del_prev=end->previous;
+        del_prev->next=NULL;
+        end=del_prev;
+        free(del->surname);
         free(del);
     }
     else{ //Ein anderes Element in der Liste soll gelöscht werden
-        delPrev=del->previous;
-        delNext=del->next;
-        delPrev->next=delNext;
-        delNext->previous=delPrev;
+        del_prev=del->previous;
+        del_next=del->next;
+        del_prev->next=del_next;
+        del_next->previous=del_prev;
+        free(del->surname);
         free(del);
     }
     printf("\t\t%c Der Student wurde gel%cscht!\n", VERTICALLINE, oe);
@@ -448,7 +451,7 @@ void deleteStudent(void){
 //Wir benutzen merge sort in der top down variante
 //Bekommt zwei pointer auf den start zweier Listen, diese beiden Listen werden sortiert und zu einer Liste zusammen gesetzt, es wird ein pointer auf den start der zusammengesetzten Liste zurück gegeben
 struct student *merge(struct student *list1, struct student *list2) {
-    struct student *head=NULL, **pp;
+    struct student *head=NULL, **pp; //pp ist ein pointer auf einen pointer
     pp = &head;
     while(TRUE){
         if (strcmp(list1->surname, list2->surname) <= 0){ //Wenn list1 mit a anfängt und list2 mit a oder b (nur ein Beispiel)
@@ -474,19 +477,19 @@ struct student *merge(struct student *list1, struct student *list2) {
 }
 
 //Bekommt einen Pointer, ab diesem Pointer wird die Liste sortiert 
-struct student *msort(struct student *sortStart){
+struct student *msort(struct student *sort_start){
     struct student *now, *after;
     //Wenn der pointer=Null ist oder die Liste auf die der Pointer verweist nur einen Eintrag ist ist die Liste bereits sortiert
-    if ((sortStart==NULL) || (sortStart->next==NULL)) return sortStart;
+    if ((sort_start==NULL) || (sort_start->next==NULL)) return sort_start;
     //Die Liste wird geteilt, um diese sortieren zu können, darum suchen wir mit dieser for-Schleife die Mitte der Liste ab den Eintrag auf den sortStart zeigt
     //Dabei geht now immer einen Eintrag weiter, währen after immer zwei Einträge weiter geht, wenn z.B. after->next==NULL ist wird die Schleife abgebrochen, weil after dann am letzen Eintrag angekommen ist.
     //(Das passiert wenn die Anzahl der Elemente ab sortStart grade ist.)
     //Wenn die Liste ab sortStart ungrade ist, währe after->next->next=NULL, wenn man am vorletzen Element währe, dadurch würde die SChleife auch abgebrochen werden, da jetzt after==NULL ist 
-    for (now=sortStart, after=sortStart->next; after && after->next; after=after->next->next) now=now->next;
+    for (now=sort_start, after=sort_start->next; after && after->next; after=after->next->next) now=now->next;
     /* split the list at mid-point */
     after=now->next;
     now->next=NULL;//Die Liste wird zwischen now und after getrennt, man kann also nur noch von after->previous zurück kommen
-    now=sortStart; //now wird jetzt zum sortStart, aber die Liste die man jetzt ab sortStart abrufen kann ist nur noch halb so lang
+    now=sort_start; //now wird jetzt zum sortStart, aber die Liste die man jetzt ab sortStart abrufen kann ist nur noch halb so lang
     /* sort the sublists recursively */
     now=msort(now);
     after=msort(after);
@@ -534,6 +537,8 @@ void printAllStudents(void){
     printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
 }
 
+//Einlesen der csv Datei. Es wird zwischen der ersten Zeile und allen anderen Zeilen unterschieden, da die erste Zeile entwender die header Zeile oder einen Studenten beinhalten kann.
+//Es wird immer eine vollständige Zeile eingelesen, welche darauf hin immer bei einem , geteilt wird. Jeder Teil der Zeile wird als String eingelesen und dann wie in inputStudent() auf seine Richtigkeit überprüft 
 void read(void){
     //Variablen zum Einlesen der Datei
     FILE *db;
@@ -541,11 +546,11 @@ void read(void){
     char *split; //Welches Zeichen die csv Datei einteilt
 
     //Variablen zum richtigen Zuordnen der eingelesenen Werte
-    int order[5]={0,1,2,3,4}; //0=surname, 1=matrikelnummer, 2=startdate, 3=exitdate, 4=birthdate
-    int run=0;
+    int order[5]={0,1,2,3,4}; //0=surname, 1=matrikelnummer, 2=startdate, 3=exitdate, 4=birthdate (Falls keine Header Zeile vorhanden ist gibt dieses Array vor welche Spalte was bedeutet)
+    int run=0; //Sagt in welcher Spalte wir uns befinden
     int err_run=0; //Sagt wie oft in der header Line abfrage das else{} durchlaufen ist
-    int line=0;
-    int c_null=0;
+    int line=0; //Sagt in welcher Zeile wir uns befinden
+    int c_null=0; //Zählt die char
     //Variablen zur übergabe an addStudent()
     char in_surname[25]; //max 24 Zeichen
     int in_matrikelnummer; //Darf nur 6 oder 7 Zeichen lang sein
@@ -563,7 +568,7 @@ void read(void){
     printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX+20;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
     //Test ob die erste Zeile der csv ein header ist, wenn nicht werden alle Einträge wie folgt eingelesen: surname, matrikelnummer, startdate, exitdate, birthdate 
     if(!feof(db)){
-        fgets(row,100,db);
+        fgets(row,100,db); //hier 100 unten 60, da die header Zeile länger sein kann als die restlichen Zeilen
         split=strtok(row, ",");
         run=0;
         while(split){
@@ -590,7 +595,7 @@ void read(void){
             }
             else if(!strcmp(split,"birthdate")){
                 order[run]=4;
-            }
+            }//Die erste Zeile wird überprüft ob eine Header Zeile Vorhanden ist 
             else{
                 for(int i=0;i<5;i++) order[i]=i;
                 if(run==err_run){
@@ -611,8 +616,8 @@ void read(void){
                                         err=FALSE;
                                     }
                                     else{
-                                        int matrikelLength=getLength(in_matrikelnummer);
-                                        if(!(5<matrikelLength && matrikelLength<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
+                                        int matrikel_length=getLength(in_matrikelnummer);
+                                        if(!(5<matrikel_length && matrikel_length<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
                                             err=TRUE;
                                             printf("\t\t%c ",VERTICALLINE);
                                             printf(ERR "Die Matrikelnummer darf nur zwischen 6 und 7 Stellen lang sein!\n" RESET);
@@ -688,14 +693,14 @@ void read(void){
                 err_run++;
             }
             run++;
-            split=strtok(NULL, ",");
+            split=strtok(NULL, ","); //geht zum nächsten getrennten Teil der row
         }
     }
     else{
         fclose(db);
         return;
     }
-    if(row[0]!='\n'){
+    if(row[0]!='\n'){ //Falls die erste Zeile leer ist liest row nur ein \n ein
         if(err_run==run){
             err=TRUE;
             if(birthyear<startyear){
@@ -768,7 +773,7 @@ void read(void){
         run=0;
         while(split){
             if(row[0]=='\n') break;
-            if(run==4){
+            if(run==4){ //Im letzten run muss das \n entfernt werden
                 for(int i=0;i<25;i++){
                     if(split[i]=='\n'){
                         split[i]='\0';
@@ -793,8 +798,8 @@ void read(void){
                                 err=FALSE;
                             }
                             else{
-                                int matrikelLength=getLength(in_matrikelnummer);
-                                if(!(5<matrikelLength && matrikelLength<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
+                                int matrikel_length=getLength(in_matrikelnummer);
+                                if(!(5<matrikel_length && matrikel_length<8)){ //Überprüfung ob 6 oder 7 Zeichen lang
                                     err=TRUE;
                                     printf("\t\t%c ",VERTICALLINE);
                                     printf(ERR "Die Matrikelnummer darf nur zwischen 6 und 7 Stellen lang sein!\n" RESET);
@@ -870,7 +875,7 @@ void read(void){
             split=strtok(NULL, ",");
         }
         err=TRUE;
-        if(row[0]!='\n'){
+        if(row[0]!='\n'){ //Test wie in inputStudent() ob die Daten überhaupt Sinn machen
             if(birthyear<startyear){
                 if(startyear<exityear){
                     err=FALSE;
@@ -932,20 +937,35 @@ void read(void){
     printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX+20;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
 }
 
+//Speichert alle students in der csv Datei ab, nach dem speichern wird der benötigte Speicher mit free() wieder freigegeben
 void save(void){
-    FILE *db;
-    db=fopen("studentDB.csv","w");
-    if(!db) return;
-    struct student *now=start;
-    fprintf(db, "surname,matrikelnummer,startdate,exitdate,birthdate\n");
-    while(now){
-        fprintf(db, "%s,%d,%02d.%02d.%04d,%02d.%02d.%04d,%02d.%02d.%04d", now->surname, now->matrikelnummer, now->startdate.day, now->startdate.month, now->startdate.year, now->exitdate.day, now->exitdate.month, now->exitdate.year, now->birthdate.day, now->birthdate.month, now->birthdate.year);
-        now=now->next;
-        if(now){
-            fprintf(db, "\n");
+    if(start){
+        FILE *db;
+        db=fopen("studentDB.csv","w");
+        if(!db) return;
+        struct student *now=start;
+        fprintf(db, "surname,matrikelnummer,startdate,exitdate,birthdate\n");
+        while(now){
+            fprintf(db, "%s,%d,%02d.%02d.%04d,%02d.%02d.%04d,%02d.%02d.%04d", now->surname, now->matrikelnummer, now->startdate.day, now->startdate.month, now->startdate.year, now->exitdate.day, now->exitdate.month, now->exitdate.year, now->birthdate.day, now->birthdate.month, now->birthdate.year);
+            now=now->next;
+            if(now){
+                fprintf(db, "\n");
+            }
+        }
+        fclose(db);
+
+        struct student *after=NULL;
+        now=start;
+        after=now->next;
+        while(now){
+            free(now->surname);
+            free(now);
+            now=after;
+            if(now){ //Am Ende ist now=NULL und NULL->next führt zum Absturz
+                after=now->next;
+            }
         }
     }
-    fclose(db);
 }
 
 //Menü
@@ -961,7 +981,7 @@ int menu(void){
             case 's':
                 pos==5?pos=0:pos++;
             break;
-        }
+        }   //w und s steuern den Pfeil hoch un runter, durch x wird die Option gewählt auf die der Pfeil zeigt
         printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
         printf("\t\t%c", VERTICALLINE); for(int i=1;i<=(MENUMAX/2)-2;i++) printf("%c", SPACE); printf("MEN%c", UE); for(int i=1;i<=(MENUMAX/2)-2;i++) printf("%c", SPACE); printf("%c\n", VERTICALLINE);
         printf("\t\t%c Dr%ccken Sie x, wenn Sie eine Auswahl getroffen haben %c\n", VERTICALLINE, ue, VERTICALLINE);
@@ -978,6 +998,7 @@ int menu(void){
         printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
         printf("\t\t");
         fflush(stdin);
+        //Jede Reihe gibt eine vollständige Reihe im Menü aus 
         input=getch();
         printf("\n");
 
@@ -987,18 +1008,16 @@ int menu(void){
 
 //Main
 int main(void){
-    system("color");
+    system("color"); //Durch color kann man in der cmd die Farbe ändern, durch system("color") kann die der Konsole des Programms geändert werden, nur durch diesen Aufruf funktionieren die oben definierten Farben 
     read();
-    //wait();
-    system("cls");
+    system("cls"); //cls cleared den Inhalt des Konsolen Fensters
     int select;
     do{
         select=menu();
-        switch (select)
-        {
+        switch(select){
         case 0:
         system("cls");
-            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT); //schöne Ausgabe
             inputStudent();
         break;
         case 1:
