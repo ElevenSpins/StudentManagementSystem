@@ -1,5 +1,8 @@
 # Finale Aufgabe
 
+### Workflow
+![build](https://shields.io/badge/build-passing-brightgreen/github/workflow/status/:user/:repo/:workflow)
+
 ## Das Programm soll eine Liste von Studenten verarbeiten
 
 ✓ Erstelle eine Studenten Struktur mit folgenden Inhalten: Nachname, Matrikelnummer, Start Datum, End Datum, geburstdatum
