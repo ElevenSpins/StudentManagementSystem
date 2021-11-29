@@ -175,8 +175,11 @@ unsigned char checkDate(char *date, unsigned int *day, unsigned int *month, unsi
     return err;
 }
 
-//Diese Funktion gibt den pointer auf den Studenten mit der Matrikelnummer zurück, wenn keiner gefunden wurde wird NULL returned! Diese Funktion testet nicht ob es bereits Einträge gibt 
+//Diese Funktion gibt den pointer auf den Studenten mit der Matrikelnummer zurück, wenn keiner gefunden wurde wird NULL returned! Returned auch NULL wenn start==NULL
 struct student *search(int s_matrikelnummer){
+    if(start==NULL){
+        return NULL;
+    }
     struct student *now;
     now=start;
     while(now!=NULL){ //Solange now auf ein Element zeigt wird überprüft ob die Matrikelnummer übereinstimmt
@@ -384,51 +387,18 @@ int countStudent(void){
 }
 
 //Gibt den Studenten mit der gesuchten Matrikelnummer aus
-void printStudent(void){
-    int s_matrikelnummer;
-    printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
-    if(!start){
-        printf("\t\t%c ",VERTICALLINE);
-        printf(ERR "Es gibt noch keine Eintr%cge in der Datenbank!\n" RESET, ae);
-        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
-        return;
-    }
-    printf("\t\t%c Zu suchende Matrikelnummer: ", VERTICALLINE);
-    setMatrikel(&s_matrikelnummer);
-    struct student *now=search(s_matrikelnummer);
-    if(!now){
-        printf("\t\t%c ",VERTICALLINE);
-        printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, s_matrikelnummer);
-        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
-        return;
-    }
+void printStudent(struct student *now){
     printf("\t\t%c",TCROSSRIGHT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSDOWN); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", TCROSSLEFT); 
     printf("\t\t%c Name                      %c Matrikelnummer %c Geburtstag %c Eintrittsdatum %c Austrittsdatum %c\n", VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE, VERTICALLINE);
     printf("\t\t%c %s", VERTICALLINE, now->surname); for(int i=0;i<(25-strlen(now->surname));i++) printf(" "); printf(" %c %d", VERTICALLINE, now->matrikelnummer); if(getLength(now->matrikelnummer)==6) printf(" "); for(int i=0;i<7;i++) printf(" "); printf(" %c %02d.%02d.%04d", VERTICALLINE, now->birthdate.day, now->birthdate.month, now->birthdate.year); printf(" %c %02d.%02d.%04d    ", VERTICALLINE, now->startdate.day, now->startdate.month, now->startdate.year); printf(" %c %02d.%02d.%04d     %c\n", VERTICALLINE, now->exitdate.day, now->exitdate.month, now->exitdate.year, VERTICALLINE); 
     printf("\t\t%c",CORNERDOWNLEFT); for(int i=1;i<=27;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=12;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c", TCROSSUP); for(int i=1;i<=16;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT); 
 }
 
-//Löscht den Studenten mit der gesuchten Matrikelnummer
-void deleteStudent(void){
-    int s_matrikelnummer; //Die zu suchende Matrikelnummer
-    printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
-    if(!start){
-        printf("\t\t%c ",VERTICALLINE);
-        printf(ERR "Es gibt noch keine Eintr%cge in der Datenbank!\n" RESET, ae);
-        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
-        return;
-    }
-    printf("\t\t%c Zu l%cschende Matrikelnummer: ", VERTICALLINE, oe);
-    setMatrikel(&s_matrikelnummer); //Einlesen der zu löschenden Matrikelnummer (in setMatrikel wird auch direkt überprüft ob diese Sinn macht)
-    struct student *del=search(s_matrikelnummer);
+//Löscht den Studenten mit der gesuchten Matrikelnummer (Diese Funktion bekommt den Pointer auf den zu löschenden Studenten)
+void deleteStudent(struct student *del){
+    //printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
     struct student *del_next=NULL; //del_next wird als pointer auf das nächste Element nach del genutzt 
     struct student *del_prev=NULL; //del_prev wird als pointer auf das Element vor dem zu löschenden genutzt
-    if(!del){
-        printf("\t\t%c ",VERTICALLINE);
-        printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, s_matrikelnummer);
-        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
-        return;
-    }
     /*LÖSCHEN*/
     if(del==start){ //Soll das erste Element gelöscht werden 
         del_next=start->next;
@@ -985,6 +955,27 @@ void save(void){
     }
 }
 
+//Diese Funktion lässt den Nutzer eine Matrikelnummer eigebe, es wird dann in der Liste gesucht ob es einen Eintrag gibt, es wird ein pointer auf das Element zurück gegeben, wenn eins gefunden wurde, NULL wenn die Liste leer ist oder nichts gefunden wurde
+struct student *inputSearch(void){
+    int s_matrikelnummer;
+    if(!start){
+        printf("\t\t%c ",VERTICALLINE);
+        printf(ERR "Es gibt noch keine Eintr%cge in der Datenbank!\n" RESET, ae);
+        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+        return NULL;
+    }
+    printf("\t\t%c Zu suchende Matrikelnummer: ", VERTICALLINE);
+    setMatrikel(&s_matrikelnummer);
+    struct student *now=search(s_matrikelnummer);
+    if(!now){
+        printf("\t\t%c ",VERTICALLINE);
+        printf(ERR "Es konnte kein Student mit der Nummer %d gefunden werden!\n" RESET, s_matrikelnummer);
+        printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+        return NULL;
+    }
+    return now;
+}
+
 //Menü
 int menu(void){
     int pos=0;
@@ -1029,6 +1020,7 @@ int main(void){
     read();
     system("cls"); //cls cleared den Inhalt des Konsolen Fensters
     int select;
+    struct student *now;
     do{
         select=menu();
         switch(select){
@@ -1050,7 +1042,12 @@ int main(void){
         break;
         case 2:
             system("cls");
-            printStudent();
+            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+            printf("\t\t%c Studenten suchen!\n", VERTICALLINE); 
+            now=inputSearch();
+            if(now){
+                printStudent(now);
+            }
             wait();
         break;
         case 3:
@@ -1060,8 +1057,14 @@ int main(void){
         break;
         case 4:
             system("cls");
-            deleteStudent();
+            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+            printf("\t\t%c Studenten l%cschen!\n", VERTICALLINE, oe); 
+            now=inputSearch();
+            if(now){
+                deleteStudent(now);
+            }
             wait();
+            select=0;
         break;
         
         case 5:
