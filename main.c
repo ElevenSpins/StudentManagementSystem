@@ -922,6 +922,14 @@ void read(void){
     
     fclose(db);
     printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX+20;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+
+    if(!end) return;
+    struct student *prev;
+    prev=end->previous;
+    if(!prev) return;
+    if(prev->matrikelnummer==end->matrikelnummer){
+        deleteStudent(prev);
+    }
 }
 
 //Speichert alle students in der csv Datei ab, nach dem speichern wird der benötigte Speicher mit free() wieder freigegeben
