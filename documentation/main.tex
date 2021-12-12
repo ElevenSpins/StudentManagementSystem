@@ -19,6 +19,7 @@
 \usepackage[T1]{fontenc} % Output font encoding for international characters
 \usepackage{fouriernc} % Use the New Century Schoolbook font
 \usepackage{graphicx}
+\usepackage{listings}
 \usepackage[english, german]{babel} 
 
 %----------------------------------------------------------------------------------------
@@ -92,14 +93,58 @@
 
 \chapter{Student Management System}
 
-\section{Student Management System} 
-\subsection{Subsection 1}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-\subsection{Subsection 2}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-\subsection{Subsection 3}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-\section{Section 02} 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+\section{Allgmeines} 
+\subsection{Intension / Aufgaenstellung}
+\begin{itemize}
+\item Erstelle eine Studenten Struktur mit folgenden Inhalten: Nachname, Matrikelnummer, Start Datum, End Datum, geburstdatum
+\item Erstelle eine Datums Struktur (day month year) fuer das gebursdatum und einschreibungsdatum etc.
+\item Schreibe eine Funktion inputStudent: Bei dem der Benutzer alle relevanten Daten zu einem Studenten eingeben kann.
+\item Schreibe eine Funktion addStudent: bei der ein Student hinzugefügt wird.
+\item Schreibe eine Funktion in der die Anzahl der gespeicherten Studenten zurueck gegeben werden soll.
+\item Schreibe eine Funktion printStudent(Matrikelnummer), mit der ein Student auf dem Bildschirm ausgegeben werden soll
+\item Schreibe eine Funktion printAllStudents, mit der alle Studenten Alphabetisch auf dem Bildschirm ausgegeben werden sollen.
+\item Schreibe eine Funktion menue, ueber die die Verschienen funktionen aufgerufen werden sollen.
+\item Schreibe eine funktion deleteStudent(matrikelnummer), welche einen Studenten loescht.
+\item Schreibe eine Funktion save die Alle gespeicherten Studenten in eine Datei speichert. Diese Funktion soll beim beenden des Programms automatisch aufgerufen werden und soll somit nicht im menue auftauchen
+\item Schreibe eine Funktion read die eine Datei ausliest und alle Studenten daraus ins Programm laed. Diese Funktion soll beim start des Programms automatisch aufgerufen werden und soll somit nicht im menue auftauchen
+\item Die Aufgabe soll mithilfe von Verketteten Listen gelöst werden.
+
+\end{itemize}
+
+\chapter{Functions} 
+This chapter contains each step of our project. Every functions, strucs or somethings else can be found in the main.c. This is only a discription of the function.
+ \section{Struct Student}
+ First we create the structure for our students
+\begin{lstlisting}[language=C]
+	struct student{
+    	char *surname;
+    	int matrikelnummer; //Muss 7 Zahlen lang sein
+    	struct date startdate;
+    	struct date exitdate;
+    	struct date birthdate;
+    	struct student *previous;
+    	struct student *next;
+}*start=NULL, *end=NULL;
+\end{lstlisting}
+
+\section{Struct Date}
+In our next step we create ihe struct date. This struct contains unsigned variables.
+\begin{lstlisting}[language=C]
+	struct date{
+        unsigned int day;
+        unsigned int month;
+        unsigned int year;
+};
+\end{lstlisting}
+\section{void wait}
+Waiting for some user interaction.
+\section{int getLength}
+Checking the length of a integer. A simple example: 10 = 2, 100=3. Also it checks the integer isn't eqal 0 beacuse in this case we get some errors.
+
+\section{checkDate}
+Here we check the Date input. In case the input isn't a real date we return True.
+
+\section{Function addStudent()}
+Here we have the function "addStudent". This function add the Student to the list. In our case this function only get pointers.
 
 \end{document}
