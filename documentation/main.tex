@@ -15,12 +15,55 @@
 
 \newcommand{\plogo}{\fbox{$\mathcal{PL}$}} % Generic dummy publisher logo
 
-\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[utf8x]{inputenc} % Required for inputting international characters
 \usepackage[T1]{fontenc} % Output font encoding for international characters
 \usepackage{fouriernc} % Use the New Century Schoolbook font
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage[english, german]{babel} 
+
+
+
+\usepackage{listings}
+\usepackage{color}
+
+%----------------------------------------------------------------------------------------
+%	Code formating things
+%----------------------------------------------------------------------------------------
+
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1,                % start line enumeration with line 1000
+  %frame=single,	               % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -70,7 +113,7 @@
 	
 	\vspace{0.8\baselineskip}
 	
-	\textit{Programmieren in C \\ Frau Goertz \\} 
+	\textit{Programmieren in C \\ Frau Goertz}
 	
 	\vfill % 
 	
@@ -91,10 +134,11 @@
 \tableofcontents
 \newpage
 
-\chapter{Student Management System}
+\chapter{Allgemein}
 
-\section{Allgmeines} 
-\subsection{Intension / Aufgaenstellung}
+\section{Allgmeines}
+Im Rahmen des "Programmieren in C" Unterrichts an der DHBW Mannheim, sollten wir in Gruppen eine Aufgabe erledigen. Diese Gruppenarbeit hatte einen größeren Umfang um somit ein messbare Leistung der Studenten zu erheben. Aufgabe war es ein Programm zu entwickeln welches den Anforderungen in \textit{1.2 Intension / Aufgaenstellung} entspricht. \newline Für das Projekt wurde ein Deadline festgelegt. Innerhalb dieses Zeitraums müssen alle Anforderungen erfüllt sein.
+\section{Intension / Aufgaenstellung} \label{aufgabe}
 \begin{itemize}
 \item Erstelle eine Studenten Struktur mit folgenden Inhalten: Nachname, Matrikelnummer, Start Datum, End Datum, geburstdatum
 \item Erstelle eine Datums Struktur (day month year) fuer das gebursdatum und einschreibungsdatum etc.
@@ -111,9 +155,52 @@
 
 \end{itemize}
 
-\chapter{Functions} 
+\chapter{Student Management System} 
+In diesem  Kapitel werden wir auf die einzelnen projektschritte eingehen. Jede verwendete bzw. entwickelte Funktion wird im folgenden erleutert. Die einzelnen Funktionen können in der "main.c" eingesehen werden. Diese liegt der Abgabe bei. \newline
 This chapter contains each step of our project. Every functions, strucs or somethings else can be found in the main.c. This is only a discription of the function.
- \section{Struct Student}
+\section{Includes}
+In diesem Schritt binden wir alle Bibliotheken ein. Wir haben verschiedene Hilfsbibliotheken eingbeunden. Im folgenden sind alle Bibliotheken zu sehen.
+\begin{lstlisting}[language=C]
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h> //Damit strcpy() finktioniert
+	#include <math.h> //Damit log() funktioniert
+	#include <conio.h> //Damit getch() funktioniert
+	#include <windows.h>	
+\end{lstlisting}
+\section{Umlaute}
+Im folgenden werden wir alle Umlaute definieren damit diese in der Konsole dargestellt werden können. In diesem Fall haben wir die Umlaute "ß, ö, ä, ü, Ü" deklariert.
+\begin{lstlisting}[language=C]
+	#define sss 0xe1 
+	#define oe 0x94 
+	#define ae 0x84 
+	#define ue 0x81 
+	#define UE 0x9a
+\end{lstlisting}
+
+\section{Farben}
+Im folgenden werden alle Umlaute deklariert, damit diese in der Konsole ausgegeben werden können.
+\begin{lstlisting}[language=C]
+	#define BLACK "\x1b[30m"
+	#define RED "\033[0;31m"
+	#define GREEN "\x1b[32m"
+	#define YELLOW "\x1b[33m"
+	#define BLUE "\x1b[34m"
+	#define MAGENTA "\x1b[35m"
+	#define CYAN "\x1b[36m"
+	#define WHITE "\x1b[37m"
+	#define RESET "\033[0m"
+\end{lstlisting}
+\subsection{Farbzuweisungen}
+Hierbei ist zu beachten das ERR RED in der *.exe Anwendung nur mit <windows.h> funktioniert. Ebenfalls muss man system(color...) verwenden. Ansonsten ist dies nicht möglich.
+
+\begin{lstlisting}[language=C]
+	#define ERR RED
+	#define SUCCESS GREEN
+	#define IMPORTANTTEXT CYAN
+\end{lstlisting}
+
+\section{Struct Student}
  First we create the structure for our students
 \begin{lstlisting}[language=C]
 	struct student{
@@ -126,15 +213,32 @@ This chapter contains each step of our project. Every functions, strucs or somet
     	struct student *next;
 }*start=NULL, *end=NULL;
 \end{lstlisting}
+\section{Sonstige Sonderzeichen}
+Im folgenden werden die Elemente für eine saubere und auch schöne Darstellung der Tabellen in der Konsole definiert.
+\begin{lstlisting}[language=C]
+	#define MENU_ARROW 0x1a
+	#define SPACE 0x20
+	#define HORIZONLINE 0xcd
+	#define VERTICALLINE 0xba
+	#define CROSS 0xce
+	#define CORNERDOWNLEFT 0xc8 
+	#define CORNERDOWNRIGHT 0xbc 
+	#define CORNERUPLEFT 0xc9 
+	#define CORNERUPRIGHT 0xbb 
+	#define TCROSSUP 0xca 
+	#define TCROSSDOWN 0xcb 
+	#define TCROSSRIGHT 0xcc 
+	#define TCROSSLEFT 0xb9 
+\end{lstlisting}
 
 \section{Struct Date}
-In our next step we create ihe struct date. This struct contains unsigned variables.
-\begin{lstlisting}[language=C]
+In diesem Schritt haben wir das Struct Date erstellt.
+\begin{lstlisting}
 	struct date{
         unsigned int day;
         unsigned int month;
         unsigned int year;
-};
+	};
 \end{lstlisting}
 \section{void wait}
 Waiting for some user interaction.
@@ -142,9 +246,126 @@ Waiting for some user interaction.
 Checking the length of a integer. A simple example: 10 = 2, 100=3. Also it checks the integer isn't eqal 0 beacuse in this case we get some errors.
 
 \section{checkDate}
-Here we check the Date input. In case the input isn't a real date we return True.
+Hier überprüfen wir den Userimput für das Datum. Das Ziel ist es dafür zu sorgen das es sich um ein echtes Datum handelt. Somit können fehler des Users ausgeschlossen werden.
 
-\section{Function addStudent()}
-Here we have the function "addStudent". This function add the Student to the list. In our case this function only get pointers.
+\section{void addStudent()}
+Diese Funktion bekommt lediglich Pointer übergeben. Die übergebenen Pointer haben die Aufgabe die Eingabe des User in die Liste hinzuzufügen. Im folgenden gehen wir auf signifikante Codebausteine ein:
+\begin{lstlisting}[language=C]
+	struct student *now, *before;
+\end{lstlisting}
+Dabei ist \textit{now} ein Pointer der auf den aktuellen Listeneintrag zeigt. Ebenfalls haben wir hier noch den Pointer \textit{before} der auf den Eintrag vor dem aktuellen Eintrag in der Liste zeigt.
 
+\section{void inpitstudent(void)}
+Diese Funktion erwartet eine \textit{void} übergabe. Die Funktion gibt dem User die Möglichkeit Alle Studentendaten einzugeben. Durch Eingabeeinschränkungen wird dafür gesorgt das der User möglichst wenig fehler macht. \newline Bei der Eingabe der Matrikelnummer wird überprüft ob diese sich bereits in der Liste befindet. Ebenfalls wird noch geprüft ob die Bedingung \textit{Geburtstag<Eintrittsdatum<Austrittsdatum} Zutrifft. Falls hierbei ein Wiederspruch vorliegt wird ein Fehler für den User Ausgeworfen.
+\section{int countStudent(void)}
+Hierbei wird die Anzahl der gespeicherten Studenten zurückgegeben.
+\section{void printStudent(struct student *now)}
+Hierbei wird die übergabe eines \textit{struct student} erwartet. Wenn dies der Fall ist wird der gewünschte Student mit der gesuchten Matrikelnummer ausgegeben.
+
+\section{void deleteStudent(struct student *del)}
+Diese Funktion hat die Aufgabe einen Studenten mit der gewünschten Matrikelnummer aus der Liste zu löschen. Hierbei wird der Funktion der Pointer des gewünschten Studenten übergeben. Damit wird sichergestellt das auch der richtige Student entfernt wird.
+
+\section{struct student}
+\begin{lstlisting}[language=C]
+	struct student *merge(struct student *list1, struct student *list2){}
+\end{lstlisting}
+Hier benutzern wir die \textit{merge sort} in der \textit{top down} variante. Dazu bekommt man zwei Pointer auf den Start zweier Listen, dabei sollen diese beisen Listen sortiert und zu einer Liste zusammengesetzt werden. Ist das geschehen wird ein Pointer zurückgegeben, welcher auf den Start der neuen Liste zeigt.
+
+\subsection{struct student // msort}
+\begin{lstlisting}[language=C]
+	struct student *msort(struct student *sort_start)
+\end{lstlisting}
+Bekommt einen Pointer übergeben. Ab diesem Pointer wird die Liste sortiert. Hierbei ist zu beachten, dass wenn der Pointer gleich \textit{NULL} ist oder die Liste auf die der Pointer verweist nur ein Eintrag ist, die Liste bereits Sortiert ist.
+\begin{lstlisting}[language=C]
+	if ((sort_start==NULL) || (sort_start->next==NULL)) return sort_start;
+\end{lstlisting}
+Folgend wird die Liste geteilt, damit man Sie sortieren kann. Daher suchen wir Sie mit einer \textit{for} Schleife ab. Dabei geht \textit{now} immer einen Eintrag weiter, währen \textit{after} immer zwei Einträge weiter geht, wenn z.B. \textit{after->next==NULL} ist wird die Schleife abgebrochen, weil after dann am letzen Eintrag angekommen ist.
+\begin{lstlisting}[language=C]
+	for (now=sort_start, after=sort_start->next; after && after->next; after=after->next->next) now=now->next;
+\end{lstlisting}
+
+\section{void sort(void)}
+Hier wird die Liste sortiert. Dabei wird sie wie eine einfach verkettete Liste behandelt.
+\section{void printAllStudents(void)}
+Diese Funktion gibt alle Studenten in einer Liste aus und formatiert diese.
+
+\section{void read(void)}
+Hierbei handelt es sich um eine Kernfunktion der Anwendung. Diese Funktion ermöglicht es eine \textit{CSV} Datei einzulesen. Hierbei wird klassisch zwischen der ersten und der letzten zeile unterschieden. Die erste Zeile stellt die Headerzeile dar. Es wird immer eine ganze Zeile eingelesen. Jeder Teil der Zeile wird immer als \textit{String} eingelesen. Als trennzeichen wird das \textit{Komma} genommen. Ebenfalls wird der Strink wie in \textit{inputStudent()} auf seine richtigkeit überprüft.
+
+\section{void save(void)}
+Hier werden alle Studenten in der \textit{CSV} Datei gespeichert. Wenn erfolgreich gespeichert wurde wird der Speicher wieder mit dem Aufruf von \textit{free()} freigegeben.
+
+\section{struct student *inputSearch(void)}
+Diese Funktion lässt den Nutzer eine Matrikelnummer eigebe, es wird dann in der Liste gesucht ob es einen Eintrag gibt, es wird ein pointer auf das Element zurück gegeben, wenn eins gefunden wurde, NULL wenn die Liste leer ist oder nichts gefunden wurde.
+
+
+\section{int menu(void)}
+Hat die schlichte Aufgabe das Menü abzubilden.
+
+\chapter{Main}
+\begin{lstlisting}[language=C]
+	int main(void){
+    system("color"); 
+    read();
+    system("cls");
+    int select;
+    struct student *now;
+    do{
+        select=menu();
+        switch(select){
+        case 0:
+        system("cls");
+            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+            inputStudent();
+        break;
+        case 1:
+            system("cls");
+            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+            int len=3;
+            int count=countStudent();
+            len=4-getLength(count);
+            printf("\t\t%c Es befinden sich " IMPORTANTTEXT "%d" RESET, VERTICALLINE, count);  printf(" Eintr%cge in der Datenbank!     ", ae); for(int i=0;i<len;i++) printf(" "); printf("%c\n", VERTICALLINE);
+            printf("\t\t%c", CORNERDOWNLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERDOWNRIGHT);
+            wait();
+        break;
+        case 2:
+            system("cls");
+            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+            printf("\t\t%c Studenten suchen!\n", VERTICALLINE); 
+            now=inputSearch();
+            if(now){
+                printStudent(now);
+            }
+            wait();
+        break;
+        case 3:
+            system("cls");
+            printAllStudents();
+            wait();
+        break;
+        case 4:
+            system("cls");
+            printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=91;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
+            printf("\t\t%c Studenten l%cschen!\n", VERTICALLINE, oe); 
+            now=inputSearch();
+            if(now){
+                deleteStudent(now);
+            }
+            wait();
+            select=0;
+        break;
+        
+        case 5:
+        break;
+        
+        default:
+            printf("\t\t%c " ERR "!Fehler select hat den ung%cltigen Wert '%d'!\n" RESET, VERTICALLINE, ue, select);
+        break;
+        }
+    }while(select!=5);
+    save();
+    system("cls");
+    return 0;
+}
+\end{lstlisting}
 \end{document}

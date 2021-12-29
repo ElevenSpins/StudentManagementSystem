@@ -1,11 +1,29 @@
 \babel@toc {german}{}
-\contentsline {chapter}{\numberline {1}Student Management System}{2}{}%
+\contentsline {chapter}{\numberline {1}Allgemein}{2}{}%
 \contentsline {section}{\numberline {1.1}Allgmeines}{2}{}%
-\contentsline {subsection}{\numberline {1.1.1}Intension / Aufgaenstellung}{2}{}%
-\contentsline {chapter}{\numberline {2}Functions}{4}{}%
-\contentsline {section}{\numberline {2.1}Struct Student}{4}{}%
-\contentsline {section}{\numberline {2.2}Struct Date}{4}{}%
-\contentsline {section}{\numberline {2.3}void wait}{5}{}%
-\contentsline {section}{\numberline {2.4}int getLength}{5}{}%
-\contentsline {section}{\numberline {2.5}checkDate}{5}{}%
-\contentsline {section}{\numberline {2.6}Function addStudent()}{5}{}%
+\contentsline {section}{\numberline {1.2}Intension / Aufgaenstellung}{2}{}%
+\contentsline {chapter}{\numberline {2}Student Management System}{4}{}%
+\contentsline {section}{\numberline {2.1}Includes}{4}{}%
+\contentsline {section}{\numberline {2.2}Umlaute}{4}{}%
+\contentsline {section}{\numberline {2.3}Farben}{5}{}%
+\contentsline {subsection}{\numberline {2.3.1}Farbzuweisungen}{5}{}%
+\contentsline {section}{\numberline {2.4}Struct Student}{5}{}%
+\contentsline {section}{\numberline {2.5}Sonstige Sonderzeichen}{6}{}%
+\contentsline {section}{\numberline {2.6}Struct Date}{6}{}%
+\contentsline {section}{\numberline {2.7}void wait}{6}{}%
+\contentsline {section}{\numberline {2.8}int getLength}{6}{}%
+\contentsline {section}{\numberline {2.9}checkDate}{6}{}%
+\contentsline {section}{\numberline {2.10}void addStudent()}{7}{}%
+\contentsline {section}{\numberline {2.11}void inpitstudent(void)}{7}{}%
+\contentsline {section}{\numberline {2.12}int countStudent(void)}{7}{}%
+\contentsline {section}{\numberline {2.13}void printStudent(struct student *now)}{7}{}%
+\contentsline {section}{\numberline {2.14}void deleteStudent(struct student *del)}{7}{}%
+\contentsline {section}{\numberline {2.15}struct student}{7}{}%
+\contentsline {subsection}{\numberline {2.15.1}struct student // msort}{8}{}%
+\contentsline {section}{\numberline {2.16}void sort(void)}{8}{}%
+\contentsline {section}{\numberline {2.17}void printAllStudents(void)}{8}{}%
+\contentsline {section}{\numberline {2.18}void read(void)}{8}{}%
+\contentsline {section}{\numberline {2.19}void save(void)}{9}{}%
+\contentsline {section}{\numberline {2.20}struct student *inputSearch(void)}{9}{}%
+\contentsline {section}{\numberline {2.21}int menu(void)}{9}{}%
+\contentsline {chapter}{\numberline {3}Main}{10}{}%
