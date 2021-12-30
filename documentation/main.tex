@@ -137,35 +137,34 @@
 \chapter{Allgemein}
 
 \section{Allgmeines}
-Im Rahmen des "Programmieren in C" Unterrichts an der DHBW Mannheim, sollten wir in Gruppen eine Aufgabe erledigen. Diese Gruppenarbeit hatte einen größeren Umfang um somit ein messbare Leistung der Studenten zu erheben. Aufgabe war es ein Programm zu entwickeln welches den Anforderungen in \textit{1.2 Intension / Aufgaenstellung} entspricht. \newline Für das Projekt wurde ein Deadline festgelegt. Innerhalb dieses Zeitraums müssen alle Anforderungen erfüllt sein.
+Im Rahmen des Programmieren in C Unterrichts an der DHBW Mannheim, sollten wir in Gruppen eine Aufgabe erledigen. Diese Gruppenarbeit hatte einen größeren Umfang um somit ein messbare Leistung der Studenten zu erheben. Die Aufgabe war es ein Programm zu entwickeln welches den Anforderungen in \textit{1.2 Intension / Aufgaenstellung} entspricht. \newline Für das Projekt wurde ein Deadline festgelegt der 30 Dez. 2021. Innerhalb dieses Zeitraums müssen alle Anforderungen erfüllt sein.
 \section{Intension / Aufgaenstellung} \label{aufgabe}
 \begin{itemize}
-\item Erstelle eine Studenten Struktur mit folgenden Inhalten: Nachname, Matrikelnummer, Start Datum, End Datum, geburstdatum
-\item Erstelle eine Datums Struktur (day month year) fuer das gebursdatum und einschreibungsdatum etc.
+\item Erstelle eine Studentenstruktur mit folgenden Inhalten: Nachname, Matrikelnummer, Start Datum, End Datum, Geburstdatum
+\item Erstelle eine Datumsstruktur (day month year) für das Gebursdatum und einschreibungsdatum etc.
 \item Schreibe eine Funktion inputStudent: Bei dem der Benutzer alle relevanten Daten zu einem Studenten eingeben kann.
 \item Schreibe eine Funktion addStudent: bei der ein Student hinzugefügt wird.
-\item Schreibe eine Funktion in der die Anzahl der gespeicherten Studenten zurueck gegeben werden soll.
-\item Schreibe eine Funktion printStudent(Matrikelnummer), mit der ein Student auf dem Bildschirm ausgegeben werden soll
+\item Schreibe eine Funktion in der die Anzahl der gespeicherten Studenten zurück gegeben werden soll.
+\item Schreibe eine Funktion printStudent(Matrikelnummer), mit der ein Student auf dem Bildschirm ausgegeben werden soll.
 \item Schreibe eine Funktion printAllStudents, mit der alle Studenten Alphabetisch auf dem Bildschirm ausgegeben werden sollen.
-\item Schreibe eine Funktion menue, ueber die die Verschienen funktionen aufgerufen werden sollen.
-\item Schreibe eine funktion deleteStudent(matrikelnummer), welche einen Studenten loescht.
-\item Schreibe eine Funktion save die Alle gespeicherten Studenten in eine Datei speichert. Diese Funktion soll beim beenden des Programms automatisch aufgerufen werden und soll somit nicht im menue auftauchen
+\item Schreibe eine Funktion menue, über die die Verschienen funktionen aufgerufen werden sollen.
+\item Schreibe eine funktion deleteStudent(matrikelnummer), welche einen Studenten löscht.
+\item Schreibe eine Funktion save, die alle gespeicherten Studenten in eine Datei speichert. Diese Funktion soll beim beenden des Programms automatisch aufgerufen werden und soll somit nicht im menue auftauchen
 \item Schreibe eine Funktion read die eine Datei ausliest und alle Studenten daraus ins Programm laed. Diese Funktion soll beim start des Programms automatisch aufgerufen werden und soll somit nicht im menue auftauchen
 \item Die Aufgabe soll mithilfe von Verketteten Listen gelöst werden.
 
 \end{itemize}
 
 \chapter{Student Management System} 
-In diesem  Kapitel werden wir auf die einzelnen projektschritte eingehen. Jede verwendete bzw. entwickelte Funktion wird im folgenden erleutert. Die einzelnen Funktionen können in der "main.c" eingesehen werden. Diese liegt der Abgabe bei. \newline
-This chapter contains each step of our project. Every functions, strucs or somethings else can be found in the main.c. This is only a discription of the function.
+In diesem  Kapitel werden wir auf die einzelnen Projektschritte eingehen. Jede verwendete bzw. entwickelte Funktion wird im folgenden erleutert. Die einzelnen Funktionen können in der \textit{main.c} eingesehen werden. Diese liegt der Abgabe bei. \newline
 \section{Includes}
 In diesem Schritt binden wir alle Bibliotheken ein. Wir haben verschiedene Hilfsbibliotheken eingbeunden. Im folgenden sind alle Bibliotheken zu sehen.
 \begin{lstlisting}[language=C]
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include <string.h> //Damit strcpy() finktioniert
-	#include <math.h> //Damit log() funktioniert
-	#include <conio.h> //Damit getch() funktioniert
+	#include <string.h> 
+	#include <math.h>
+	#include <conio.h>
 	#include <windows.h>	
 \end{lstlisting}
 \section{Umlaute}
@@ -179,7 +178,7 @@ Im folgenden werden wir alle Umlaute definieren damit diese in der Konsole darge
 \end{lstlisting}
 
 \section{Farben}
-Im folgenden werden alle Umlaute deklariert, damit diese in der Konsole ausgegeben werden können.
+Im folgenden werden alle Farben deklariert, damit diese in der Konsole ausgegeben werden können.
 \begin{lstlisting}[language=C]
 	#define BLACK "\x1b[30m"
 	#define RED "\033[0;31m"
@@ -192,7 +191,7 @@ Im folgenden werden alle Umlaute deklariert, damit diese in der Konsole ausgegeb
 	#define RESET "\033[0m"
 \end{lstlisting}
 \subsection{Farbzuweisungen}
-Hierbei ist zu beachten das ERR RED in der *.exe Anwendung nur mit <windows.h> funktioniert. Ebenfalls muss man system(color...) verwenden. Ansonsten ist dies nicht möglich.
+Hierbei ist zu beachten das \textit{ERR RED} in der *.exe Anwendung nur mit <windows.h> funktioniert. Ebenfalls muss man system(color...) verwenden. Ansonsten ist dies nicht möglich.
 
 \begin{lstlisting}[language=C]
 	#define ERR RED
@@ -201,11 +200,11 @@ Hierbei ist zu beachten das ERR RED in der *.exe Anwendung nur mit <windows.h> f
 \end{lstlisting}
 
 \section{Struct Student}
- First we create the structure for our students
+ Wir haben hier das Struct Student angelegt.
 \begin{lstlisting}[language=C]
 	struct student{
     	char *surname;
-    	int matrikelnummer; //Muss 7 Zahlen lang sein
+    	int matrikelnummer;
     	struct date startdate;
     	struct date exitdate;
     	struct date birthdate;
@@ -241,12 +240,13 @@ In diesem Schritt haben wir das Struct Date erstellt.
 	};
 \end{lstlisting}
 \section{void wait}
-Waiting for some user interaction.
+Wartet auf eine interaktin des Users.
 \section{int getLength}
 Checking the length of a integer. A simple example: 10 = 2, 100=3. Also it checks the integer isn't eqal 0 beacuse in this case we get some errors.
+Überprüft die länge des \textit{integer}. Als einfaches Beispiel 10 = 2, 100 = 3. Ebenfalls wird überprüft ob der \textit{integer} ungleich 0 ist. Falls der \textit{integer} 0 wäre würde hier ein Fehler abgefangen werden.
 
 \section{checkDate}
-Hier überprüfen wir den Userimput für das Datum. Das Ziel ist es dafür zu sorgen das es sich um ein echtes Datum handelt. Somit können fehler des Users ausgeschlossen werden.
+Hier überprüfen wir den Userinput für das Datum. Das Ziel ist es dafür zu sorgen, dass es sich um ein echtes Datum handelt. Somit können Fehler des Users ausgeschlossen werden.
 
 \section{void addStudent()}
 Diese Funktion bekommt lediglich Pointer übergeben. Die übergebenen Pointer haben die Aufgabe die Eingabe des User in die Liste hinzuzufügen. Im folgenden gehen wir auf signifikante Codebausteine ein:
@@ -255,12 +255,14 @@ Diese Funktion bekommt lediglich Pointer übergeben. Die übergebenen Pointer ha
 \end{lstlisting}
 Dabei ist \textit{now} ein Pointer der auf den aktuellen Listeneintrag zeigt. Ebenfalls haben wir hier noch den Pointer \textit{before} der auf den Eintrag vor dem aktuellen Eintrag in der Liste zeigt.
 
-\section{void inpitstudent(void)}
-Diese Funktion erwartet eine \textit{void} übergabe. Die Funktion gibt dem User die Möglichkeit Alle Studentendaten einzugeben. Durch Eingabeeinschränkungen wird dafür gesorgt das der User möglichst wenig fehler macht. \newline Bei der Eingabe der Matrikelnummer wird überprüft ob diese sich bereits in der Liste befindet. Ebenfalls wird noch geprüft ob die Bedingung \textit{Geburtstag<Eintrittsdatum<Austrittsdatum} Zutrifft. Falls hierbei ein Wiederspruch vorliegt wird ein Fehler für den User Ausgeworfen.
+\section{void inputstudent(void)}
+Diese Funktion erwartet eine \textit{void} Übergabe. Die Funktion gibt dem User die Möglichkeit alle Studentendaten einzugeben. Durch Eingabeeinschränkungen wird dafür gesorgt das der User möglichst wenig Fehler macht. \newline Bei der Eingabe der Matrikelnummer wird überprüft ob diese sich bereits in der Liste befindet. \newline Ebenfalls wird noch geprüft ob die Bedingung \newline \textit{Geburtstag < Eintrittsdatum < Austrittsdatum} Zutrifft. Falls hierbei ein Wiederspruch vorliegt wird ein Fehler für den User Ausgeworfen.
 \section{int countStudent(void)}
 Hierbei wird die Anzahl der gespeicherten Studenten zurückgegeben.
+
+
 \section{void printStudent(struct student *now)}
-Hierbei wird die übergabe eines \textit{struct student} erwartet. Wenn dies der Fall ist wird der gewünschte Student mit der gesuchten Matrikelnummer ausgegeben.
+Hierbei wird die Übergabe eines \textit{struct student} erwartet. Wenn dies der Fall ist wird der gewünschte Student mit der gesuchten Matrikelnummer ausgegeben.
 
 \section{void deleteStudent(struct student *del)}
 Diese Funktion hat die Aufgabe einen Studenten mit der gewünschten Matrikelnummer aus der Liste zu löschen. Hierbei wird der Funktion der Pointer des gewünschten Studenten übergeben. Damit wird sichergestellt das auch der richtige Student entfernt wird.
@@ -269,17 +271,17 @@ Diese Funktion hat die Aufgabe einen Studenten mit der gewünschten Matrikelnumm
 \begin{lstlisting}[language=C]
 	struct student *merge(struct student *list1, struct student *list2){}
 \end{lstlisting}
-Hier benutzern wir die \textit{merge sort} in der \textit{top down} variante. Dazu bekommt man zwei Pointer auf den Start zweier Listen, dabei sollen diese beisen Listen sortiert und zu einer Liste zusammengesetzt werden. Ist das geschehen wird ein Pointer zurückgegeben, welcher auf den Start der neuen Liste zeigt.
+Hier benutzen wir die \textit{merge sort} in der \textit{top down} variante. Dazu bekommt man zwei Pointer auf den Start zweier Listen, dabei sollen diese beisen Listen sortiert und zu einer Liste zusammengesetzt werden. Ist das geschehen wird ein Pointer zurückgegeben, welcher auf den Start der neuen Liste zeigt.
 
 \subsection{struct student // msort}
 \begin{lstlisting}[language=C]
 	struct student *msort(struct student *sort_start)
 \end{lstlisting}
-Bekommt einen Pointer übergeben. Ab diesem Pointer wird die Liste sortiert. Hierbei ist zu beachten, dass wenn der Pointer gleich \textit{NULL} ist oder die Liste auf die der Pointer verweist nur ein Eintrag ist, die Liste bereits Sortiert ist.
+Bekommt einen Pointer übergeben. Ab diesem Pointer wird die Liste sortiert. Hierbei ist zu beachten, dass wenn der Pointer gleich \textit{NULL} ist oder die Liste auf die der Pointer verweist nur ein Eintrag ist, die Liste bereits sortiert ist.
 \begin{lstlisting}[language=C]
 	if ((sort_start==NULL) || (sort_start->next==NULL)) return sort_start;
 \end{lstlisting}
-Folgend wird die Liste geteilt, damit man Sie sortieren kann. Daher suchen wir Sie mit einer \textit{for} Schleife ab. Dabei geht \textit{now} immer einen Eintrag weiter, währen \textit{after} immer zwei Einträge weiter geht, wenn z.B. \textit{after->next==NULL} ist wird die Schleife abgebrochen, weil after dann am letzen Eintrag angekommen ist.
+Wie folgt wird die Liste geteilt, damit man Sie sortieren kann. Daher suchen wir sie mit einer \textit{for} Schleife ab. Dabei geht \textit{now} immer einen Eintrag weiter, währen \textit{after} immer zwei Einträge weiter geht, wenn z.B. \textit{after->next==NULL} ist wird die Schleife abgebrochen, weil after dann am letzen Eintrag angekommen ist.
 \begin{lstlisting}[language=C]
 	for (now=sort_start, after=sort_start->next; after && after->next; after=after->next->next) now=now->next;
 \end{lstlisting}
@@ -290,19 +292,22 @@ Hier wird die Liste sortiert. Dabei wird sie wie eine einfach verkettete Liste b
 Diese Funktion gibt alle Studenten in einer Liste aus und formatiert diese.
 
 \section{void read(void)}
-Hierbei handelt es sich um eine Kernfunktion der Anwendung. Diese Funktion ermöglicht es eine \textit{CSV} Datei einzulesen. Hierbei wird klassisch zwischen der ersten und der letzten zeile unterschieden. Die erste Zeile stellt die Headerzeile dar. Es wird immer eine ganze Zeile eingelesen. Jeder Teil der Zeile wird immer als \textit{String} eingelesen. Als trennzeichen wird das \textit{Komma} genommen. Ebenfalls wird der Strink wie in \textit{inputStudent()} auf seine richtigkeit überprüft.
+Hierbei handelt es sich um eine Kernfunktion der Anwendung. Diese Funktion ermöglicht es eine \textit{CSV} Datei einzulesen. Hierbei wird klassisch zwischen der ersten und der letzten Zeile unterschieden. Die erste Zeile stellt die Headerzeile dar. Es wird immer eine ganze Zeile eingelesen. Jeder Teil der Zeile wird immer als \textit{String} eingelesen. Als Trennzeichen wird das \textit{Komma} genommen. Ebenfalls wird der \textit{String} wie in \textit{inputStudent()} auf seine Richtigkeit überprüft.
+Bei dieser Funktion hatten wir das problem das wenn die CSV Datei eine leere letzte Zeile hatte, die letze Zeile doppelt eingelesen haben. Um das zu beheben schauen wir ob die letze und vorletze die selbe Martikelnummer haben. Falls dies der Fall ist wird die letzte Zeile wieder rausgelöscht.
 
 \section{void save(void)}
 Hier werden alle Studenten in der \textit{CSV} Datei gespeichert. Wenn erfolgreich gespeichert wurde wird der Speicher wieder mit dem Aufruf von \textit{free()} freigegeben.
 
 \section{struct student *inputSearch(void)}
-Diese Funktion lässt den Nutzer eine Matrikelnummer eigebe, es wird dann in der Liste gesucht ob es einen Eintrag gibt, es wird ein pointer auf das Element zurück gegeben, wenn eins gefunden wurde, NULL wenn die Liste leer ist oder nichts gefunden wurde.
+Diese Funktion lässt den Nutzer eine Matrikelnummer eingeben, es wird dann in der Liste gesucht ob es einen Eintrag gibt, es wird ein Pointer auf das Element zurück gegeben, wenn eins gefunden wurde, NULL wenn die Liste leer ist oder nichts gefunden wurde.
 
 
 \section{int menu(void)}
 Hat die schlichte Aufgabe das Menü abzubilden.
 
 \chapter{Main}
+\section{Grundlegendes}
+Die main Funktion verbindet alle Teilfunktionen und übernimmt die Gestaltung in der Konsole.
 \begin{lstlisting}[language=C]
 	int main(void){
     system("color"); 
