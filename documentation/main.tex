@@ -239,23 +239,23 @@ In diesem Schritt haben wir das Struct Date erstellt.
         unsigned int year;
 	};
 \end{lstlisting}
-\section{void wait}
+\section{void wait(void)}
 Wartet auf eine interaktin des Users.
-\section{int getLength}
+\section{int getLength(int nummer)}
 Checking the length of a integer. A simple example: 10 = 2, 100=3. Also it checks the integer isn't eqal 0 beacuse in this case we get some errors.
 Überprüft die länge des \textit{integer}. Als einfaches Beispiel 10 = 2, 100 = 3. Ebenfalls wird überprüft ob der \textit{integer} ungleich 0 ist. Falls der \textit{integer} 0 wäre würde hier ein Fehler abgefangen werden.
 
-\section{checkDate}
+\section{checkDate(\textit{pointer})}
 Hier überprüfen wir den Userinput für das Datum. Das Ziel ist es dafür zu sorgen, dass es sich um ein echtes Datum handelt. Somit können Fehler des Users ausgeschlossen werden.
 
-\section{void addStudent()}
+\section{void addStudent(\textit{pointer})}
 Diese Funktion bekommt lediglich Pointer übergeben. Die übergebenen Pointer haben die Aufgabe die Eingabe des User in die Liste hinzuzufügen. Im folgenden gehen wir auf signifikante Codebausteine ein:
 \begin{lstlisting}[language=C]
 	struct student *now, *before;
 \end{lstlisting}
 Dabei ist \textit{now} ein Pointer der auf den aktuellen Listeneintrag zeigt. Ebenfalls haben wir hier noch den Pointer \textit{before} der auf den Eintrag vor dem aktuellen Eintrag in der Liste zeigt.
 
-\section{void inputstudent(void)}
+\section{void inputStudent(void)}
 Diese Funktion erwartet eine \textit{void} Übergabe. Die Funktion gibt dem User die Möglichkeit alle Studentendaten einzugeben. Durch Eingabeeinschränkungen wird dafür gesorgt das der User möglichst wenig Fehler macht. \newline Bei der Eingabe der Matrikelnummer wird überprüft ob diese sich bereits in der Liste befindet. \newline Ebenfalls wird noch geprüft ob die Bedingung \newline \textit{Geburtstag < Eintrittsdatum < Austrittsdatum} Zutrifft. Falls hierbei ein Wiederspruch vorliegt wird ein Fehler für den User Ausgeworfen.
 \section{int countStudent(void)}
 Hierbei wird die Anzahl der gespeicherten Studenten zurückgegeben.
@@ -308,6 +308,7 @@ Hat die schlichte Aufgabe das Menü abzubilden.
 \chapter{Main}
 \section{Grundlegendes}
 Die main Funktion verbindet alle Teilfunktionen und übernimmt die Gestaltung in der Konsole.
+\section{Aufbau der main funktion}
 \begin{lstlisting}[language=C]
 	int main(void){
     system("color"); 
@@ -324,7 +325,7 @@ Die main Funktion verbindet alle Teilfunktionen und übernimmt die Gestaltung in
             inputStudent();
         break;
         case 1:
-            system("cls");
+            system("cls");i
             printf("\t\t%c", CORNERUPLEFT); for(int i=1;i<=MENUMAX;i++) printf("%c", HORIZONLINE); printf("%c\n", CORNERUPRIGHT);
             int len=3;
             int count=countStudent();
